@@ -30,3 +30,6 @@ PYTHONPATH=project_z/src python project_z/benchmarks/run_benchmark.py --events 1
 - **D — Streaming ingestion:** defer until throughput, ordering, replay, retention, and back-pressure requirements are specified.
 
 Recommended sequence: A now, build evaluation dataset, then compare B and C offline. Do not introduce a vector database before a measurable retrieval need exists.
+
+## Continuous integration
+The pull-request workflow runs the Project Q evidence-gate tests, Project Z telemetry tests, and a small synthetic benchmark smoke test. CI success is a correctness check on this fixture workload, not a production performance claim.
