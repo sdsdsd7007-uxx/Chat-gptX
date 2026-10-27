@@ -40,6 +40,7 @@ def main() -> None:
 
     ingest_ms: list[float] = []
     search_ms: list[float] = []
+    combined_ms: list[float] = []
     accepted = 0
     events = ()
     for _ in range(args.iterations):
@@ -50,7 +51,9 @@ def main() -> None:
         events = result.accepted
         start = time.perf_counter()
         search_events(events, "request latency service-3", limit=20)
-        search_ms.append((time.perf_counter() - start) * 1000)
+        search_duration = (time.perf_counter() - start) * 1000
+        search_ms.append(search_duration)
+        combined_ms.append(ingest_ms[-1] + search_duration)
 
     print(json.dumps({
         "dataset": "synthetic-only",
@@ -60,7 +63,8 @@ def main() -> None:
         "ingestion_ms": {"median": round(statistics.median(ingest_ms), 3), "p95": round(percentile(ingest_ms, 95), 3)},
         "lexical_search_ms": {"median": round(statistics.median(search_ms), 3), "p95": round(percentile(search_ms, 95), 3)},
         "p95_target_ms": 150,
-        "target_met": percentile(ingest_ms + search_ms, 95) < 150,
+        "combined_pipeline_ms": {"median": round(statistics.median(combined_ms), 3), "p95": round(percentile(combined_ms, 95), 3)},
+        "target_met": percentile(combined_ms, 95) < 150,
         "note": "Microbenchmark only; hardware/runtime dependent and not a production SLO.",
     }, indent=2))
 
