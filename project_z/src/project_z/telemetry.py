@@ -12,7 +12,7 @@ import re
 from typing import Iterable
 
 
-TOKEN_RE = re.compile(r"[a-z0-9_]+")
+TOKEN_RE = re.compile(r"[a-z0-9]+")
 
 
 @dataclass(frozen=True)
