@@ -68,6 +68,10 @@ class TelemetryTests(unittest.TestCase):
         results = search_events(events, "request latency catalog")
         self.assertEqual([event.event_id for event in results], ["e-1"])
 
+    def test_underscore_metric_tokenization(self):
+        events = ingest_jsonl([row("e-1"), row("e-2", metric="queue_depth")]).accepted
+        self.assertEqual([e.event_id for e in search_events(events, "request latency")], ["e-1"])
+
     def test_search_is_deterministic_for_ties(self):
         events = ingest_jsonl([row("z"), row("a")]).accepted
         self.assertEqual([e.event_id for e in search_events(events, "catalog", limit=2)], ["a", "z"])
