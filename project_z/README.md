@@ -8,6 +8,8 @@ This is an isolated, synthetic-data-only engineering pilot. It performs no netwo
 - `tests/test_telemetry.py`: validation, rejection, and search behavior tests.
 - `fixtures/synthetic-events.jsonl`: tiny, fabricated sample dataset.
 - `benchmarks/run_benchmark.py`: reproducible ingestion and lexical-search microbenchmark.
+- `src/project_z/evaluation.py`: offline precision@k, recall@k, MRR, and nDCG@k evaluation.
+- `fixtures/retrieval-qrels.json`: small fabricated query/relevance labels.
 
 ## Run locally
 ```bash
