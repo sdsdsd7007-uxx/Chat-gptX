@@ -8,6 +8,7 @@ on:
       - "portfolio/**"
       - ".github/workflows/project-q-checks.yml"
       - ".github/dependabot.yml"
+      - ".github/CODEOWNERS"
   push:
     branches:
       - "project-q/controlled-foundation"
