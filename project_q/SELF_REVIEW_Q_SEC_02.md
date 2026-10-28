@@ -34,7 +34,7 @@ Severity labels above describe the impact if the reference implementation were u
 
 ## Verification evidence
 
-The prior current-head run #48 passed 25 Project Q tests and 25 Project Z tests. This review cycle changes the schema, evaluator, tests and documentation; therefore run #48 does not verify the new head. The latest commit must pass CI before this cycle is called verified.
+The final CI run for commit 13cdd848780beeb0043986354764b01e9b6babd7 completed successfully (run 40625129839). Project Q: 33/33 tests passed. Project Z: 25/25 tests passed. Total: 58/58 tests passed. The 500-event synthetic benchmark (30 repetitions) reported ingestion median/p95 6.376/7.123 ms, lexical search median/p95 1.509/1.612 ms, and combined pipeline median/p95 7.917/8.735 ms. These are hosted-runner microbenchmark observations, not representative workload or production SLO evidence.
 
 ## Independent review required
 
