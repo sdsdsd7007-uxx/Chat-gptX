@@ -56,7 +56,7 @@ The controlled CI workflow runs:
 2. Project Z telemetry and retrieval-evaluation tests;
 3. a 500-event / 30-iteration synthetic benchmark smoke test.
 
-Final verified CI run #157 passed on head b2006fcf291518c9b16a4c0145060e49fcc32b43. Project Z suite: 28 tests passed; Project Q suite: 57 tests passed; total 85 tests passed. The 500-event / 30-repetition benchmark smoke test completed successfully. Exact timing output was not exposed in the inspected run summary, so no new numeric baseline is claimed. A green CI result is not an independent security review, privacy approval, production performance certification or deployment authorization.
+Final verified CI run #159 passed on head 339b8a4381436264fa46dcd06acb453ccc962821. Project Z suite: 28 tests passed; Project Q suite: 57 tests passed; total 85 tests passed. The 500-event / 30-repetition benchmark smoke test completed successfully. Exact timing output was not exposed in the inspected run summary, so no new numeric baseline is claimed. A green CI result is not an independent security review, privacy approval, production performance certification or deployment authorization.
 
 ## 6. Promotion gates
 
