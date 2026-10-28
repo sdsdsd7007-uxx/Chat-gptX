@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from project_q.replay_ledger import consume_approval
+from project_q.release_gate import GateDecision
 
 
 class ReplayLedgerTests(unittest.TestCase):
@@ -12,11 +13,13 @@ class ReplayLedgerTests(unittest.TestCase):
     NOW = datetime(2026, 10, 28, 12, 0, tzinfo=timezone.utc)
 
     def consume(self, db, approval_id="approval-1", nonce="0123456789abcdef0123456789abcdef", **kwargs):
-        return consume_approval(
-            db, approval_id=approval_id, nonce=nonce,
-            record_digest=self.DIGEST, policy_version="1.2.0",
-            decision_allowed=True, consumed_at=self.NOW, **kwargs
-        )
+        approval = {
+            "approval_id": approval_id, "nonce": nonce,
+            "artifact_digest": self.DIGEST, "policy_version": "1.2.0"
+        }
+        decision = GateDecision(True, (), "1.2.0", self.DIGEST)
+        return consume_approval(db, approval=approval, decision=decision,
+                                consumed_at=self.NOW, **kwargs)
 
     def test_first_approval_consumes(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -41,31 +44,41 @@ class ReplayLedgerTests(unittest.TestCase):
 
     def test_denied_policy_decision_is_not_consumed(self):
         with tempfile.TemporaryDirectory() as tmp:
-            result = consume_approval(
-                Path(tmp) / "ledger.sqlite", approval_id="a", nonce="0123456789abcdef",
-                record_digest=self.DIGEST, policy_version="1.2.0",
-                decision_allowed=False, consumed_at=self.NOW
-            )
+            approval = {"approval_id": "a", "nonce": "0123456789abcdef",
+                        "artifact_digest": self.DIGEST, "policy_version": "1.2.0"}
+            decision = GateDecision(False, ("BLOCKED",), "1.2.0", self.DIGEST)
+            result = consume_approval(Path(tmp) / "ledger.sqlite", approval=approval,
+                                      decision=decision, consumed_at=self.NOW)
         self.assertFalse(result.consumed)
         self.assertEqual(result.code, "PRIOR_POLICY_DECISION_NOT_ALLOWED")
 
     def test_invalid_digest_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
-            result = consume_approval(
-                Path(tmp) / "ledger.sqlite", approval_id="a", nonce="0123456789abcdef",
-                record_digest="not-a-digest", policy_version="1.2.0",
-                decision_allowed=True, consumed_at=self.NOW
-            )
+            approval = {"approval_id": "a", "nonce": "0123456789abcdef",
+                        "artifact_digest": "not-a-digest", "policy_version": "1.2.0"}
+            decision = GateDecision(True, (), "1.2.0", "not-a-digest")
+            result = consume_approval(Path(tmp) / "ledger.sqlite", approval=approval,
+                                      decision=decision, consumed_at=self.NOW)
         self.assertFalse(result.consumed)
         self.assertEqual(result.code, "RECORD_DIGEST_INVALID")
 
+    def test_policy_decision_binding_mismatch_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            approval = {"approval_id": "a", "nonce": "0123456789abcdef",
+                        "artifact_digest": self.DIGEST, "policy_version": "1.2.0"}
+            decision = GateDecision(True, (), "1.1.0", self.DIGEST)
+            result = consume_approval(Path(tmp) / "ledger.sqlite", approval=approval,
+                                      decision=decision, consumed_at=self.NOW)
+        self.assertFalse(result.consumed)
+        self.assertEqual(result.code, "POLICY_DECISION_BINDING_MISMATCH")
+
     def test_naive_consumption_time_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
-            result = consume_approval(
-                Path(tmp) / "ledger.sqlite", approval_id="a", nonce="0123456789abcdef",
-                record_digest=self.DIGEST, policy_version="1.2.0",
-                decision_allowed=True, consumed_at=datetime(2026, 10, 28, 12, 0)
-            )
+            approval = {"approval_id": "a", "nonce": "0123456789abcdef",
+                        "artifact_digest": self.DIGEST, "policy_version": "1.2.0"}
+            decision = GateDecision(True, (), "1.2.0", self.DIGEST)
+            result = consume_approval(Path(tmp) / "ledger.sqlite", approval=approval,
+                                      decision=decision, consumed_at=datetime(2026, 10, 28, 12, 0))
         self.assertFalse(result.consumed)
         self.assertEqual(result.code, "CONSUMPTION_TIME_MUST_BE_TIMEZONE_AWARE")
 
@@ -82,11 +95,11 @@ class ReplayLedgerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             parent_file = Path(tmp) / "not-a-directory"
             parent_file.write_text("x")
-            result = consume_approval(
-                parent_file / "ledger.sqlite", approval_id="a", nonce="0123456789abcdef",
-                record_digest=self.DIGEST, policy_version="1.2.0",
-                decision_allowed=True, consumed_at=self.NOW
-            )
+            approval = {"approval_id": "a", "nonce": "0123456789abcdef",
+                        "artifact_digest": self.DIGEST, "policy_version": "1.2.0"}
+            decision = GateDecision(True, (), "1.2.0", self.DIGEST)
+            result = consume_approval(parent_file / "ledger.sqlite", approval=approval,
+                                      decision=decision, consumed_at=self.NOW)
         self.assertFalse(result.consumed)
         self.assertEqual(result.code, "REPLAY_LEDGER_UNAVAILABLE")
 
