@@ -80,10 +80,12 @@
       "properties": {
         "source_url": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "minLength": 1
         },
         "source_document": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "publication_date": {
           "type": "string",
@@ -255,7 +257,9 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "minItems": 1,
+          "uniqueItems": true
         },
         "expires_at": {
           "type": "string",
@@ -310,7 +314,22 @@
       }
     },
     "audit": {
-      "type": "object"
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "created_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "last_verified": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "next_review": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
     }
   }
 }
