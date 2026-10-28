@@ -1,0 +1,9 @@
+# Repository owner is the initial code owner. This does not replace independent security review.
+# Enforce these patterns through repository rules/branch protection.
+* @sdsdsd7007-uxx
+/.github/workflows/ @sdsdsd7007-uxx
+/.github/CODEOWNERS @sdsdsd7007-uxx
+/project_q/schemas/ @sdsdsd7007-uxx
+/project_q/src/project_q/ @sdsdsd7007-uxx
+/project_q/tests/ @sdsdsd7007-uxx
+/project_q/*SECURITY* @sdsdsd7007-uxx

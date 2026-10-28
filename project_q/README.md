@@ -5,6 +5,12 @@ This repository contribution is a **reviewable, non-production foundation**. It 
 ## Components
 - `schemas/evidence-record.schema.json`: JSON Schema Draft 2020-12 contract.
 - `src/project_q/release_gate.py`: fail-closed evidence and approval policy evaluator.
+- `src/project_q/replay_ledger.py`: SQLite-backed atomic one-time approval/nonce consumption reference component.
+- `tests/test_replay_ledger.py`: uniqueness, concurrency and fail-closed replay-ledger tests.
+- `src/project_q/inventory_scanner.py`: symlink-rejecting, path-contained, read-only local inventory with file and directory records plus a reproducible JSON manifest.
+- `tests/test_inventory_scanner.py`: symlink, path containment, no-overwrite and reproducibility regressions.
+- `tests/test_recovery_simulation.py`: disposable local backup/restore simulation; not a Dropbox staging acceptance test.
+- `STAGING_RECOVERY_ACCEPTANCE_BRIEF.md`: preconditions and independent sign-off record for any separately authorized staging recovery test.
 - `tests/test_release_gate.py`: allow/deny tests, including signature-tampering cases.
 - `.github/workflows/project-q-checks.yml`: pull-request validation workflow with immutable action references.
 - `.github/dependabot.yml`: weekly GitHub Actions dependency update proposals.
@@ -37,3 +43,30 @@ The evaluator is a reference policy component. It does not perform deployment. P
 - `HAC`: historical assistant claim
 
 Never label a claim `VEF` without a recorded verification method and supporting source.
+
+
+## Policy v1.2.0 hardening
+The current security-hardening branch requires source provenance and verifier identity, binds policy version and approval validity window into the Ed25519 signature, accepts an explicit revoked-key set, and requires a recovery-test evidence reference when recovery is required. See [Trust and Approval Lifecycle](TRUST_AND_APPROVAL_LIFECYCLE.md).
+
+The revocation set and trusted public-key map are caller-supplied controls, not a deployed key-management service. Identity proofing, key custody, rotation, revocation freshness, trusted time, and audit operations remain external prerequisites. This evaluator remains non-production and blocks production promotion.
+
+
+## Signed approval replay protection — reference component
+
+Policy v1.2.0 approval envelopes now require signed `approval_id` and `nonce` claims. The separate `replay_ledger.py` component atomically consumes each identifier once using SQLite transactions and unique constraints. A concurrent test verifies that only one of eight attempts using the same nonce can succeed.
+
+**Important limitations:** this is a local SQLite reference component for isolated non-production evaluation. It is not a distributed replay service, does not authenticate the trust bundle, does not itself verify approval signatures, and does not provide multi-region consistency, operational backup/restore, tamper-evident audit, or production-grade access control. The caller must first obtain an allowed policy decision using a fresh authenticated trust/revocation state and then pass the exact signed approval claims to the ledger. A denied policy decision is never consumed. Storage errors fail closed. Do not use this SQLite implementation as a production authorization service without independent design review and operational controls.
+
+
+## Secure local inventory (non-production)
+Run only against an explicitly approved local folder. The scanner rejects symlinks, uses descriptor-relative traversal with O_NOFOLLOW, records directories and files, emits a deterministic snapshot digest, and creates CSV/JSON reports outside the source root without overwriting existing outputs.
+
+Example:
+```bash
+PYTHONPATH=project_q/src python -m project_q.inventory_scanner --root "/approved/local/source" --output "/separate/reports/inventory.csv"
+```
+
+The scanner cannot inspect Dropbox remote-only files or cloud sharing permissions. Permission status remains not_checked. The report is proposal-only; no source writes are performed.
+
+## Recovery testing boundary
+The automated recovery simulation uses temporary local directories and synthetic files. It does not write to Dropbox STAGING_PILOT. The governing Dropbox validation plan remains DRY RUN ONLY; real staging recovery requires separate written authorization and independent acceptance.
