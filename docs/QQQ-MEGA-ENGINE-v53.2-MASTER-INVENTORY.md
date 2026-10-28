@@ -125,3 +125,28 @@ Rules:
 This master inventory is a documentation baseline. An individual engine, feature or sub-project is DONE only when its scoped deliverable exists, acceptance tests pass on the exact version, evidence and unresolved risks are recorded, responsible owners and independent reviewers are identified, and applicable approvals are present.
 
 **Current status: INVENTORY DOCUMENTED / IMPLEMENTATION PARTIALLY VERIFIED / LIVE OPERATIONS UNKNOWN / PRODUCTION HOLD.**
+
+
+## 11. Next-cycle Intelligence and Recommendation control plane
+
+The following supplemental orchestration units sit across the existing five pathways and twelve base engine domains; they do **not** change the base inventory counts. They separate evidence-building from advice and from execution:
+
+| Supplemental project | Unit | Engine | Purpose | Gate |
+|---|---|---|---|---|
+| QQQ-ISP-NextGen-Steering | NC-00 — Objective & scope | Next-Cycle Orchestrator | Convert declared goal into bounded scope, work packages, dependencies and stop conditions | Scope and permissions |
+| QQQ-ISP-Intelligence-Cycle | NC-01 — Evidence lifecycle | QQQ-Intelligence Engine | Receive, scope, ingest, validate, analyze, synthesize, assess and report | Provenance, freshness and uncertainty |
+| QQQ-ISP-Recommendations | NC-02 — Options & priorities | QQQ-Recommendation Engine | Turn a report into options, trade-offs, owner roles, acceptance criteria and rollback | Separate review / no implied execution |
+| QQQ-ISP-Autonomous-Adaptation | NC-03 — Change proposal | Controlled Adaptation Engine | Draft versioned improvement proposals from verified outcome data | Offline regression tests and independent approval |
+| QQQ-ISP-CrossFlows | NC-04 — Data contracts | Cross-Flows / Integration Engine | Define integration, lineage, reconciliation and conflict handling | Authorized adapters and test evidence |
+| QQQ-ISP-Assurance | NC-05 — Security and release | Security & Governance Engine | Record risks, privacy/source controls, and go/no-go evidence | Independent review and formal release approval |
+| QQQ-ISP-StudyKnowledge | NC-06 — Learning workflow | QQQ-StudyCore | Source-linked study notes and applied learning exercises | Citation / rights review |
+| QQQ-ISP-JassimSultan-Leadership | NC-07 — Leadership study | Leadership Study Engine | Study strategic thinking and related leadership/renaissance works | Edition, page references and learning review |
+| QQQ-ISP-NextGenAI-EvalLab | NC-08 — Comparative evaluation | Evaluation Engine | Compare models and tools using repeatable tasks | Exact versions, conditions and scoring method |
+
+### Closed-loop contract
+
+`RECEIVE → SCOPE → INGEST → VALIDATE → ANALYZE → SYNTHESIZE → ASSESS → REPORT → RECOMMEND → GATE → APPROVED ACTION → VERIFY OUTCOME → LEARN → NEXT CYCLE`
+
+The Intelligence Engine creates the report; the Recommendation Engine creates the option set. Neither may approve its own consequential action. If a source, permission, owner or acceptance condition is missing, the phase is UNKNOWN or BLOCKED and production remains HOLD.
+
+The local dashboard's Next-Cycle tab simulates this workflow only. It does not fetch sources, execute recommendations, connect cloud services or run indefinitely in the background.
