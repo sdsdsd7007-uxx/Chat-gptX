@@ -248,6 +248,18 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertFalse(decision.allowed)
         self.assertIn("POLICY_EVALUATION_ERROR:ValueError", decision.blockers)
 
+    def test_mismatched_provenance_records_blocked(self):
+        record = valid_record()
+        record["source_records"] = ["fixture://synthetic/other"]
+        record = sign_record(record)
+        self.assertIn("EVIDENCE_SOURCE_RECORDS_MISMATCH", evaluate(record, now=NOW).blockers)
+
+    def test_future_evidence_timestamp_blocked(self):
+        record = valid_record()
+        record["evidence"]["verified_at"] = "2026-10-29T00:00:00Z"
+        record = sign_record(record)
+        self.assertIn("EVIDENCE_TIMESTAMP_IN_FUTURE", evaluate(record, now=NOW).blockers)
+
     def test_tampered_signature_fails_closed(self):
         record = valid_record()
         record["approval"]["signature"] = base64.b64encode(b"x" * 64).decode("ascii")
