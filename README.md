@@ -11,7 +11,7 @@ This branch introduces a small, dependency-free foundation for validating teleme
 This is a starter implementation, not a deployed telemetry service. It does not connect to production systems, write to a master register, route to a backup channel, or execute autonomous actions.
 
 ## Requirements
-Node.js 20 or newer. No third-party runtime dependencies.
+Node.js 24.x LTS is the CI target. No third-party runtime dependencies are required.
 
 ## Run tests
 Run: node --test
