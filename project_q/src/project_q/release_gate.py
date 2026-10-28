@@ -123,7 +123,9 @@ def evaluate_release(
             blockers.append("APPROVAL_DIGEST_MISMATCH")
         if approval["policy_version"] != POLICY_VERSION:
             blockers.append("APPROVAL_POLICY_VERSION_MISMATCH")
-        if approval["key_id"] in (revoked_approval_key_ids or set()):
+        if revoked_approval_key_ids is None:
+            blockers.append("REVOCATION_STATUS_UNAVAILABLE")
+        elif approval["key_id"] in revoked_approval_key_ids:
             blockers.append("APPROVAL_KEY_REVOKED")
         if not verify_approval_signature(digest, approval, trusted_approval_keys):
             blockers.append("APPROVAL_SIGNATURE_INVALID_OR_UNTRUSTED")
