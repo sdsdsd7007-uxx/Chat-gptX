@@ -1,8 +1,12 @@
 import json
-import math
 import unittest
 
-from project_z.telemetry import ingest_jsonl, search_events
+from project_z.telemetry import (
+    MAX_LINE_CHARS,
+    MAX_TAGS,
+    ingest_jsonl,
+    search_events,
+)
 
 
 def row(event_id="e-1", **overrides):
@@ -55,16 +59,40 @@ class TelemetryTests(unittest.TestCase):
         self.assertEqual(len(result.accepted), 0)
 
     def test_rejects_non_finite_value(self):
-        raw = row().replace("42.5", "NaN")
-        result = ingest_jsonl([raw])
+        result = ingest_jsonl([row(value=float("nan"))])
+        self.assertEqual(len(result.accepted), 0)
+
+    def test_rejects_extremely_large_integer(self):
+        result = ingest_jsonl([row().replace("42.5", str(10**400))])
         self.assertEqual(len(result.accepted), 0)
 
     def test_rejects_invalid_tags(self):
         result = ingest_jsonl([row(tags=["not", "an", "object"])])
         self.assertEqual(len(result.accepted), 0)
 
+    def test_rejects_excessive_tag_count(self):
+        tags = {f"k{i}": "v" for i in range(MAX_TAGS + 1)}
+        result = ingest_jsonl([row(tags=tags)])
+        self.assertEqual(len(result.accepted), 0)
+
+    def test_rejects_duplicate_json_keys(self):
+        raw = '{"event_id":"a","event_id":"b","timestamp":"2026-10-27T12:00:00Z","source":"s","metric":"m","value":1,"unit":"ms"}'
+        result = ingest_jsonl([raw])
+        self.assertEqual(len(result.accepted), 0)
+        self.assertIn("duplicate JSON object key", result.rejected[0]["reason"])
+
+    def test_rejects_oversized_line(self):
+        result = ingest_jsonl([" " * (MAX_LINE_CHARS + 1)])
+        self.assertEqual(len(result.accepted), 0)
+        self.assertIn("maximum length", result.rejected[0]["reason"])
+
+    def test_rejects_non_string_line(self):
+        result = ingest_jsonl([None])
+        self.assertEqual(len(result.accepted), 0)
+        self.assertIn("must be a string", result.rejected[0]["reason"])
+
     def test_search_matches_metric_and_tags(self):
-        events = ingest_jsonl([row("e-1"), row("e-2", metric="queue_depth", tags={"service":"worker"})]).accepted
+        events = ingest_jsonl([row("e-1"), row("e-2", metric="queue_depth", tags={"service": "worker"})]).accepted
         results = search_events(events, "request latency catalog")
         self.assertEqual([event.event_id for event in results], ["e-1"])
 
