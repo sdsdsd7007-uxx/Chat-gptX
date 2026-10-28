@@ -1,5 +1,6 @@
 import json
 import unittest
+from unittest.mock import patch
 
 from project_z.telemetry import (
     MAX_LINE_CHARS,
@@ -90,6 +91,21 @@ class TelemetryTests(unittest.TestCase):
         result = ingest_jsonl([None])
         self.assertEqual(len(result.accepted), 0)
         self.assertIn("must be a string", result.rejected[0]["reason"])
+
+    def test_stops_consuming_after_batch_limit(self):
+        consumed = []
+
+        def source():
+            for index in range(5):
+                consumed.append(index)
+                yield row(f"e-{index}")
+
+        with patch("project_z.telemetry.MAX_BATCH_LINES", 2):
+            result = ingest_jsonl(source())
+
+        self.assertEqual(len(result.accepted), 2)
+        self.assertEqual(consumed, [0, 1, 2])
+        self.assertIn("batch exceeds maximum", result.rejected[-1]["reason"])
 
     def test_search_matches_metric_and_tags(self):
         events = ingest_jsonl([row("e-1"), row("e-2", metric="queue_depth", tags={"service": "worker"})]).accepted
