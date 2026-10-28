@@ -46,3 +46,18 @@ test('rejects non-finite numeric values', () => {
     financial_impact: { classification: 'estimated', currency: 'UGX', value: Number.NaN }
   }).valid, false);
 });
+
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+test('schema declares primitive types for optional and nested financial fields', () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const schema = JSON.parse(readFileSync(resolve(here, '../schemas/telemetry-event.v1.schema.json'), 'utf8'));
+  assert.equal(schema.properties.owner_id.type, 'string');
+  assert.equal(schema.properties.evidence_reference.type, 'string');
+  assert.equal(schema.properties.source_version.type, 'string');
+  assert.equal(schema.properties.financial_impact.properties.source_reference.type, 'string');
+  assert.equal(schema.properties.financial_impact.properties.reconciled.type, 'boolean');
+  assert.equal(schema.properties.financial_impact.properties.value.type, 'number');
+});
