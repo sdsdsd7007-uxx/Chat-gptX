@@ -78,7 +78,7 @@ def valid_record():
 
 
 def evaluate(record, **kwargs):
-    return evaluate_release(record, trusted_approval_keys=TRUSTED_TEST_KEYS, **kwargs)
+    return evaluate_release(record, trusted_approval_keys=TRUSTED_TEST_KEYS, revoked_approval_key_ids=set(), **kwargs)
 
 
 class ReleaseGateTests(unittest.TestCase):
@@ -161,7 +161,7 @@ class ReleaseGateTests(unittest.TestCase):
         self.assertIn("EVALUATION_TIME_MUST_BE_TIMEZONE_AWARE", decision.blockers)
 
     def test_missing_trusted_key_fails_closed(self):
-        decision = evaluate_release(valid_record(), now=NOW)
+        decision = evaluate_release(valid_record(), revoked_approval_key_ids=set(), now=NOW)
         self.assertIn("APPROVAL_SIGNATURE_INVALID_OR_UNTRUSTED", decision.blockers)
 
     def test_tampered_approval_claim_fails_signature(self):
@@ -169,6 +169,13 @@ class ReleaseGateTests(unittest.TestCase):
         record["approval"]["expires_at"] = "2027-10-29T12:00:00Z"
         self.assertIn("APPROVAL_SIGNATURE_INVALID_OR_UNTRUSTED", evaluate(record, now=NOW).blockers)
 
+
+
+    def test_missing_revocation_registry_fails_closed(self):
+        decision = evaluate_release(
+            valid_record(), trusted_approval_keys=TRUSTED_TEST_KEYS, now=NOW
+        )
+        self.assertIn("REVOCATION_STATUS_UNAVAILABLE", decision.blockers)
 
     def test_revoked_approval_key_blocked(self):
         decision = evaluate_release(
