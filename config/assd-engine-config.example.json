@@ -1,0 +1,18 @@
+{
+  "environment": "example-only",
+  "version": 1,
+  "minStudyConfidence": 0.8,
+  "routing": {
+    "confidenceThreshold": 0.85
+  },
+  "telemetry": {
+    "maxRetryCount": 3
+  },
+  "kpi": {
+    "alertTolerancePercent": 5
+  },
+  "resourceEfficiency": {
+    "targetPercent": 80
+  },
+  "safetyNote": "Illustrative defaults only; do not use as production policy without review and approval."
+}
