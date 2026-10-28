@@ -11,6 +11,9 @@ from datetime import datetime, timezone
 import re
 import sqlite3
 from pathlib import Path
+from collections.abc import Mapping
+
+from .release_gate import GateDecision
 
 _HEX_DIGEST = re.compile(r"^[a-f0-9]{64}$")
 
@@ -24,11 +27,8 @@ class ConsumptionResult:
 def consume_approval(
     database: str | Path,
     *,
-    approval_id: str,
-    nonce: str,
-    record_digest: str,
-    policy_version: str,
-    decision_allowed: bool,
+    approval: Mapping[str, object],
+    decision: GateDecision,
     consumed_at: datetime | None = None,
 ) -> ConsumptionResult:
     """Atomically consume an approval_id and nonce once in a durable SQLite DB.
@@ -36,8 +36,14 @@ def consume_approval(
     A unique constraint on each identifier plus BEGIN IMMEDIATE serializes
     competing writers. Any duplicate or storage failure fails closed.
     """
-    if decision_allowed is not True:
+    if not isinstance(decision, GateDecision) or not decision.allowed:
         return ConsumptionResult(False, "PRIOR_POLICY_DECISION_NOT_ALLOWED")
+    approval_id = approval.get("approval_id")
+    nonce = approval.get("nonce")
+    record_digest = approval.get("artifact_digest")
+    policy_version = approval.get("policy_version")
+    if record_digest != decision.record_digest or policy_version != decision.policy_version:
+        return ConsumptionResult(False, "POLICY_DECISION_BINDING_MISMATCH")
     if not isinstance(approval_id, str) or not approval_id.strip() or len(approval_id) > 256:
         return ConsumptionResult(False, "APPROVAL_ID_INVALID")
     if not isinstance(nonce, str) or not nonce.strip() or len(nonce) > 256:
