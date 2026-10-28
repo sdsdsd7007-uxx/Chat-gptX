@@ -119,7 +119,7 @@ class ReleaseGateTests(unittest.TestCase):
         record = valid_record()
         record["approval"]["scopes"] = []
         record = sign_record(record)
-        self.assertIn("REQUIRED_SCOPE_MISSING", evaluate(record, now=NOW).blockers)
+        self.assertTrue(any(item.startswith("SCHEMA:approval/scopes") for item in evaluate(record, now=NOW).blockers))
 
     def test_digest_mismatch_blocked(self):
         record = valid_record()
