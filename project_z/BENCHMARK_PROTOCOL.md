@@ -6,7 +6,7 @@
 
 ## Current verified smoke-test scope
 
-The current CI smoke test processes 500 fabricated events over 5 iterations and reports median / p95 for ingestion, search and the combined pipeline. These values are run-specific observations from a small GitHub-hosted runner. Consult the linked workflow run and its logs for the exact observation; do not copy a single run's latency into a stable baseline or production SLO.
+The current CI smoke test processes 500 fabricated events over 30 iterations and reports median / p95 for ingestion, search and the combined pipeline. The controlled workflow also runs bounded-input regression tests for the 16 MiB ingestion cap, 4,096-character query cap and 100,000-event search cap. These values are run-specific observations from a small GitHub-hosted runner. Consult the linked workflow run and its logs for the exact observation; do not copy a single run's latency into a stable baseline or production SLO.
 
 The smoke test establishes only that the benchmark path executes and accepts its synthetic fixture. It does not establish representative retrieval quality, production throughput, tail-latency guarantees, or operational capacity.
 
