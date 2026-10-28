@@ -1,12 +1,8 @@
-"""Fail-closed release policy for Project Q evidence records.
-
-This module evaluates policy only. It never deploys or changes external systems.
-Approval claims are authenticated with Ed25519 against caller-supplied trusted keys.
-"""
+"""Fail-closed Project Q policy evaluator; this module never deploys or writes externally."""
 from __future__ import annotations
 
 import base64
-from collections.abc import Mapping
+from collections.abc import Mapping, Set
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
@@ -18,8 +14,8 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from jsonschema import Draft202012Validator, FormatChecker
 
-
 SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas" / "evidence-record.schema.json"
+POLICY_VERSION = "1.2.0"
 REQUIRED_SCOPE = "release"
 
 
@@ -32,19 +28,23 @@ class GateDecision:
 
 
 def canonical_digest(record: dict[str, Any]) -> str:
-    """Hash stable record content while excluding its separately signed approval."""
+    """SHA-256 over the record excluding its separately signed approval envelope."""
     payload = {key: value for key, value in record.items() if key != "approval"}
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    encoded = json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+    ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
 
 def approval_signature_payload(record_digest: str, approval: dict[str, Any]) -> bytes:
-    """Canonical bytes signed by the approver; every approval claim except signature is covered."""
+    """Bind every approval claim (including policy version and validity window) to the digest."""
     payload = {
         "record_digest": record_digest,
         "approval": {key: value for key, value in approval.items() if key != "signature"},
     }
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+    ).encode("utf-8")
 
 
 def verify_approval_signature(
@@ -52,14 +52,16 @@ def verify_approval_signature(
     approval: dict[str, Any],
     trusted_approval_keys: Mapping[str, bytes] | None,
 ) -> bool:
-    """Verify an Ed25519 approval using an explicitly supplied trusted-key registry."""
-    if not trusted_approval_keys:
+    """Verify Ed25519 against an externally provisioned trusted public-key registry."""
+    if not isinstance(trusted_approval_keys, Mapping):
         return False
     public_key_bytes = trusted_approval_keys.get(approval["key_id"])
-    if not isinstance(public_key_bytes, bytes):
+    if not isinstance(public_key_bytes, bytes) or len(public_key_bytes) != 32:
         return False
     try:
         signature = base64.b64decode(approval["signature"], validate=True)
+        if len(signature) != 64:
+            return False
         public_key = Ed25519PublicKey.from_public_bytes(public_key_bytes)
         public_key.verify(signature, approval_signature_payload(record_digest, approval))
         return True
@@ -67,13 +69,22 @@ def verify_approval_signature(
         return False
 
 
+def _parse_aware_datetime(value: str) -> datetime:
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("timestamp must include a timezone offset")
+    return parsed
+
+
 def evaluate_release(
     record: dict[str, Any],
     *,
     trusted_approval_keys: Mapping[str, bytes] | None = None,
+    revoked_approval_key_ids: Set[str] | None = None,
     schema_path: Path = SCHEMA_PATH,
     now: datetime | None = None,
 ) -> GateDecision:
+    """Evaluate a signed evidence record. Missing trust/revocation inputs fail closed."""
     blockers: list[str] = []
     digest = "unavailable"
     try:
@@ -86,7 +97,7 @@ def evaluate_release(
         errors = sorted(validator.iter_errors(record), key=lambda e: list(map(str, e.path)))
         if errors:
             blockers.extend(f"SCHEMA:{'/'.join(map(str, e.path)) or '<root>'}" for e in errors)
-            return GateDecision(False, tuple(blockers), "1.1.0", digest)
+            return GateDecision(False, tuple(blockers), POLICY_VERSION, digest)
 
         evidence = record["evidence"]
         lifecycle = record["lifecycle"]
@@ -98,6 +109,8 @@ def evaluate_release(
             blockers.append("EVIDENCE_NOT_VERIFIED")
         if evidence["verification_status"] != "verified":
             blockers.append("VERIFICATION_STATUS_NOT_VERIFIED")
+        if not evidence["source_records"] or not evidence["verified_by"].strip():
+            blockers.append("EVIDENCE_PROVENANCE_INCOMPLETE")
         if lifecycle["status"] != "verified":
             blockers.append("LIFECYCLE_NOT_VERIFIED")
         if risk["level"] in {"critical", "unknown", "high"}:
@@ -108,6 +121,10 @@ def evaluate_release(
             blockers.append("APPROVAL_REFERENCE_MISSING")
         if approval["artifact_digest"] != digest:
             blockers.append("APPROVAL_DIGEST_MISMATCH")
+        if approval["policy_version"] != POLICY_VERSION:
+            blockers.append("APPROVAL_POLICY_VERSION_MISMATCH")
+        if approval["key_id"] in (revoked_approval_key_ids or set()):
+            blockers.append("APPROVAL_KEY_REVOKED")
         if not verify_approval_signature(digest, approval, trusted_approval_keys):
             blockers.append("APPROVAL_SIGNATURE_INVALID_OR_UNTRUSTED")
         if approval["environment"] != lifecycle["environment"]:
@@ -116,21 +133,31 @@ def evaluate_release(
             blockers.append("REQUIRED_SCOPE_MISSING")
 
         current = now or datetime.now(timezone.utc)
-        if current.tzinfo is None:
+        if current.tzinfo is None or current.utcoffset() is None:
             blockers.append("EVALUATION_TIME_MUST_BE_TIMEZONE_AWARE")
         else:
-            expiry = datetime.fromisoformat(approval["expires_at"].replace("Z", "+00:00"))
-            if expiry <= current:
+            not_before = _parse_aware_datetime(approval["not_before"])
+            expires_at = _parse_aware_datetime(approval["expires_at"])
+            current_utc = current.astimezone(timezone.utc)
+            if not_before > current_utc:
+                blockers.append("APPROVAL_NOT_YET_VALID")
+            if expires_at <= current_utc:
                 blockers.append("APPROVAL_EXPIRED")
+            if expires_at <= not_before:
+                blockers.append("APPROVAL_VALIDITY_WINDOW_INVALID")
 
-        if recovery["required"] and (recovery["status"] != "tested" or not recovery["plan"].strip()):
-            blockers.append("RECOVERY_NOT_TESTED_OR_PLAN_MISSING")
+        if recovery["required"] and (
+            recovery["status"] != "tested"
+            or not recovery["plan"].strip()
+            or not recovery["test_evidence_ref"].strip()
+        ):
+            blockers.append("RECOVERY_TEST_EVIDENCE_MISSING_OR_UNVERIFIED")
 
-        # This component deliberately never grants production promotion.
+        # This reference evaluator never grants production promotion.
         if lifecycle["environment"] == "production":
             blockers.append("PRODUCTION_REQUIRES_SEPARATE_RELEASE_WORKFLOW")
 
-    except Exception as exc:  # fail closed on malformed input, I/O, schema or validator errors
+    except Exception as exc:  # fail closed for malformed input, schema, I/O and policy errors
         blockers.append(f"POLICY_EVALUATION_ERROR:{type(exc).__name__}")
 
-    return GateDecision(not blockers, tuple(blockers), "1.1.0", digest)
+    return GateDecision(not blockers, tuple(blockers), POLICY_VERSION, digest)
