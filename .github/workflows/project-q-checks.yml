@@ -11,6 +11,7 @@ on:
   push:
     branches:
       - "project-q/controlled-foundation"
+      - "project-q/security-hardening-q-sec-02"
     paths:
       - "project_q/**"
       - "project_z/**"
