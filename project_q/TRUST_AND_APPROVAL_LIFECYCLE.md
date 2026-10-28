@@ -55,7 +55,17 @@ The caller-supplied public-key map and revocation set are configuration inputs, 
 
 When recovery is required, the record must contain a recovery test evidence reference, a tested status and a non-empty recovery plan. The schema only checks that the reference exists syntactically; a reviewer or separate evidence verifier must inspect the referenced test result and confirm its scope, date, environment and outcome.
 
-## 6. Limits and release boundary
+## 6. Serialization and interoperability contract
+
+The current implementation computes its digest and signature payload using Python's JSON serializer with sorted object keys, compact separators, UTF-8 output, Unicode preserved, and non-finite numbers rejected. This is a deterministic Python serialization profile, not a claim of RFC 8785/JCS conformance.
+
+Until a formally specified cross-language canonicalization profile and shared test vectors are adopted:
+- all signing and verification must use the same versioned implementation/profile;
+- do not assume another language's default JSON serializer produces identical bytes;
+- treat any serializer/profile change as a cryptographic policy migration requiring new test vectors and reviewer approval;
+- test Unicode, numeric representations, escaping, nested objects and key-order permutations.
+
+## 7. Limits and release boundary
 
 - Schema validity is not proof of evidence truth.
 - A valid Ed25519 signature proves possession of the corresponding private key, not the real-world identity or authority of the signer.
@@ -64,10 +74,10 @@ When recovery is required, the record must contain a recovery test evidence refe
 - The evaluator never authorizes production promotion. Production requires a separate reviewed workflow and a separate explicit authorization.
 - No account synchronization, external publishing, financial operation, sensitive-data ingestion or physical-system control is implemented here.
 
-## 7. Independent review checklist
+## 8. Independent review checklist
 
 The reviewer should independently test:
-- canonicalization across languages and JSON edge cases;
+- Python serialization profile, cross-language canonicalization limits and JSON edge cases;
 - signature binding and key-ID handling;
 - not-before/expiry boundary conditions and clock skew;
 - revocation freshness and emergency behavior;
