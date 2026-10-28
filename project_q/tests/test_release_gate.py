@@ -221,6 +221,21 @@ class ReleaseGateTests(unittest.TestCase):
         record = sign_record(record)
         self.assertIn("APPROVAL_VALIDITY_WINDOW_INVALID", evaluate(record, now=NOW).blockers)
 
+    def test_empty_source_document_rejected_by_schema(self):
+        record = valid_record()
+        record["evidence"]["source_document"] = ""
+        self.assertFalse(evaluate(record, now=NOW).allowed)
+
+    def test_duplicate_approval_scopes_rejected_by_schema(self):
+        record = valid_record()
+        record["approval"]["scopes"] = ["release", "release"]
+        self.assertFalse(evaluate(record, now=NOW).allowed)
+
+    def test_unknown_audit_field_rejected_by_schema(self):
+        record = valid_record()
+        record["audit"] = {"unexpected_admin_override": True}
+        self.assertFalse(evaluate(record, now=NOW).allowed)
+
     def test_tampered_signature_fails_closed(self):
         record = valid_record()
         record["approval"]["signature"] = base64.b64encode(b"x" * 64).decode("ascii")
