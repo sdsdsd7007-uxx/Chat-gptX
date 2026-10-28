@@ -29,6 +29,7 @@
 | SR-06 | Medium | CI executes repository-controlled code and installs repository-controlled dependencies on a hosted runner. Token permissions are read-only and checkout credentials are not persisted, but supply-chain isolation remains necessary. | Review untrusted-PR isolation, dependency pinning and repository protections independently. |
 | SR-07 | Medium | Evidence source presence and verifier fields do not establish source truth, source authority or reviewer competence. | Independent source validation and audit trail required. |
 | SR-08 | Medium | Trusted clock, clock skew and emergency revocation propagation are not implemented. | Define trusted-time and operational incident procedures before real authorization use. |
+| SR-09 | High | GitHub API inspection reported branch protection disabled on both main and project-q/controlled-foundation; required status checks/enforcement were off. | Repository owner must configure protected branches/rulesets, require independent review and passing CI, restrict bypass, and verify the effective settings. This connector cannot configure repository administration settings. |
 
 Severity labels above describe the impact if the reference implementation were used as a production trust service; they are not an independent audit rating.
 
@@ -42,4 +43,4 @@ An independent application-security/cryptography reviewer must inspect the exact
 
 ## Release decision
 
-**Not approved for merge or deployment by this self-review.** Keep PR draft/open. Production remains blocked pending independent review, trust-service design, recovery evidence verification, repository protection review and separate explicit authorization.
+**Not approved for merge or deployment by this self-review.** Keep PR draft/open. Production remains blocked pending independent review, trust-service design, recovery evidence verification, repository protection configuration and verification, and separate explicit authorization.
