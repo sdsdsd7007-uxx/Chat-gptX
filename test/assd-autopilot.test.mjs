@@ -136,3 +136,18 @@ test('cannot apply an update when the current value differs from the study basel
     evidenceReference:'approval:123', approvedAtUtc:'2026-10-28T10:00:00Z', baseConfigVersion:1
   }), /configuration changed since the study/);
 });
+test('subengine evidence outside the registered study sources blocks updates', () => {
+  const input = study();
+  input.subsystems.CERE.evidenceReferences = ['unregistered:reference'];
+  const result = runStudyCycle(input, config());
+  assert.equal(result.state, 'INVESTIGATE');
+  assert.equal(result.subengines.find((item) => item.engineId === 'CERE').status, 'NOT_VERIFIED');
+});
+
+test('invalid confidence policy blocks the study rather than falling back silently', () => {
+  const invalidConfig = config();
+  invalidConfig.minStudyConfidence = 2;
+  const result = runStudyCycle(study(), invalidConfig);
+  assert.equal(result.state, 'INVESTIGATE');
+  assert.ok(result.issues.some((item) => item.includes('minStudyConfidence')));
+});
