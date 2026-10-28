@@ -6,7 +6,9 @@
 
 ## Current verified smoke-test scope
 
-The verified workflow run executes 500 fabricated events over 5 iterations, validates ingestion and lexical retrieval, and reports median / p95 for ingestion, search and their combined pipeline. The recorded combined p95 of 4.696 ms is a single small GitHub-hosted-runner observation. It is not a production SLO, stable baseline, or representative workload result.
+The current CI smoke test processes 500 fabricated events over 5 iterations and reports median / p95 for ingestion, search and the combined pipeline. These values are run-specific observations from a small GitHub-hosted runner. Consult the linked workflow run and its logs for the exact observation; do not copy a single run's latency into a stable baseline or production SLO.
+
+The smoke test establishes only that the benchmark path executes and accepts its synthetic fixture. It does not establish representative retrieval quality, production throughput, tail-latency guarantees, or operational capacity.
 
 ## Required protocol before comparing retrieval designs
 
@@ -65,7 +67,7 @@ Do not select a vector database or declare the 150 ms p95 objective met until:
 
 ## Research basis
 
-- NIST AI RMF: Govern, Map, Measure, Manage; measurement should document uncertainty and support independent review. https://www.nist.gov/itl/ai-risk-management-framework
+- NIST AI RMF: Govern, Map, Measure, Manage; the framework is undergoing revision, so check the current NIST page for updates. https://www.nist.gov/itl/ai-risk-management-framework
 - Thomas et al. (SIGIR 2026), *Evaluation Validity in Information Retrieval*: evaluation metrics are abstractions and should be checked for validity against intended user outcomes. https://www.microsoft.com/en-us/research/publication/evaluation-validity-in-information-retrieval/
 - Soboroff (NIST, 2014), *Computing confidence intervals for common IR measures*. https://www.nist.gov/publications/computing-confidence-intervals-common-ir-measures
 - IBM Research / ACL 2023, *Moving Beyond Downstream Task Accuracy for Information Retrieval Benchmarking*: include latency and hardware/cost conditions alongside quality. https://research.ibm.com/publications/moving-beyond-downstream-task-accuracy-for-information-retrieval-benchmarking
