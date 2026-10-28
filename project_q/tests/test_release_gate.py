@@ -71,6 +71,8 @@ def valid_record():
             "not_before": "2026-10-28T11:00:00Z",
             "policy_version": "1.2.0",
             "key_id": "test-approver-01",
+            "approval_id": "TEST-APPROVAL-ID-001",
+            "nonce": "0123456789abcdef0123456789abcdef",
             "signature": ""
         },
         "recovery": {"required": True, "status": "tested", "plan": "Restore the isolated test fixture.", "test_evidence_ref": "fixture://recovery/test-001"}
