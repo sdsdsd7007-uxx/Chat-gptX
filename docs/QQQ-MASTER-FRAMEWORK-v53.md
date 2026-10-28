@@ -135,19 +135,22 @@ Time bands below are planning estimates, not delivery promises.
 
 ## 10. Research-informed design changes (reviewed 2026-10-28)
 
-- **Agent governance:** use per-tool authorization, narrow identities, sandboxing, threat modelling, monitoring and human oversight; avoid granting an agent broad unrestricted access.
+- **Agent governance:** use per-tool authorization, narrow identities, sandboxing, threat modelling, monitoring and human oversight; map controls against the OWASP GenAI security guidance for agentic applications and NIST AI RMF. Avoid granting an agent broad unrestricted access.
 - **Observability:** instrument traces, metrics and logs with a vendor-neutral telemetry approach; attach each signal to a version, environment and execution ID.
 - **PQC readiness:** add a cryptographic inventory and migration plan rather than claiming a generic “quantum shield”.
 - **Reliability engineering:** limit retry amplification, use bounded retries/backpressure and prove restore/rollback outcomes.
 - **AI improvement:** evaluate proposed changes in a controlled test set and require a review before promotion; don’t allow the learning engine to change its own approval rules.
 
-## 11. Primary references
+## 11. Primary references (reviewed 2026-10-28)
 
-1. CISA and partner agencies, *Careful Adoption of Agentic Artificial Intelligence (AI) Services* (April 2026): https://www.cisa.gov/resources-tools/resources/careful-adoption-agentic-artificial-intelligence-ai-services
-2. NIST, *AI Risk Management Framework*: https://www.nist.gov/itl/ai-risk-management-framework
-3. NIST, *Transition to Post-Quantum Cryptography Standards*, NISTIR 8547 news/summary dated 2026-10-27: https://www.nist.gov/news-events/news/2026/10/nist-report-provides-guidelines-transition-post-quantum-cryptography
-4. NIST NCCoE, *Migration to Post-Quantum Cryptography*: https://www.nccoe.nist.gov/applied-cryptography/migration-to-pqc
-5. OpenTelemetry documentation (metrics, logs, traces): https://opentelemetry.io/docs/
+1. OWASP GenAI Security Project, *OWASP GenAI LLM Top 10 2026* (published August 2026): https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/
+2. OWASP GenAI Security Project, *Top 10 for Agentic Applications* (2025): https://genai.owasp.org/2025/12/09/owasp-genai-security-project-releases-top-10-risks-and-mitigations-for-agentic-ai-security/
+3. NIST, *AI Risk Management Framework*: https://www.nist.gov/itl/ai-risk-management-framework
+4. NIST, *Transition to Post-Quantum Cryptography Standards*, NISTIR 8547 final report dated 2026-10-27: https://www.nist.gov/news-events/news/2026/10/nist-report-provides-guidelines-transition-post-quantum-cryptography
+5. NIST NCCoE, *Migration to Post-Quantum Cryptography*: https://www.nccoe.nist.gov/applied-cryptography/migration-to-pqc
+6. OpenTelemetry documentation (metrics, logs, traces): https://opentelemetry.io/docs/
+
+These references support the proposed architecture and test plan; they do not attest that QQQ components are deployed or operational.
 
 ## 12. Version and approval record
 
