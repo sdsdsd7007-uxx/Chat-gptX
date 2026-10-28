@@ -36,7 +36,7 @@ An approval is valid only when:
 - `expires_at > not_before`;
 - the approval is signed by a currently trusted, non-revoked key.
 
-The reference evaluator accepts an externally supplied `revoked_approval_key_ids` set. If a key is listed there, its approval is blocked even when the signature verifies.
+The reference evaluator requires an explicitly supplied `revoked_approval_key_ids` set. If this input is omitted, the evaluator blocks with `REVOCATION_STATUS_UNAVAILABLE`; it does not silently assume that no keys are revoked. If a key is listed in the set, its approval is blocked even when the signature verifies.
 
 ## 4. Trust-key operations — required before real use
 
@@ -49,7 +49,7 @@ This repository does not implement a key-management service. Before any real app
 6. backup and recovery of trust metadata;
 7. algorithm/version migration and key retirement.
 
-The caller-supplied public-key map and revocation set are configuration inputs, not a complete lifecycle system. They must come from an authenticated, access-controlled source. Never embed production private keys in this repository, CI variables exposed to untrusted code, or test fixtures.
+The caller-supplied public-key map and revocation set are configuration inputs, not a complete lifecycle system. The revocation set must be present and sourced from an authenticated, current registry; absence blocks approval. They must come from an authenticated, access-controlled source. Never embed production private keys in this repository, CI variables exposed to untrusted code, or test fixtures.
 
 ## 5. Recovery evidence
 
