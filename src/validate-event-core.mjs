@@ -31,8 +31,23 @@ export function validateEvent(event) {
   }
   if ('timestamp_utc' in event) {
     const timestamp = event.timestamp_utc;
-    const strictUtc = typeof timestamp === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(timestamp) && !Number.isNaN(Date.parse(timestamp));
-    if (!strictUtc) errors.push('timestamp_utc must be a valid UTC ISO timestamp with seconds and a trailing Z');
+    const match = typeof timestamp === 'string'
+      ? timestamp.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z$/)
+      : null;
+    const instant = match ? new Date(timestamp) : null;
+    const validUtc = Boolean(
+      match &&
+      instant &&
+      !Number.isNaN(instant.getTime()) &&
+      Number(match[1]) >= 1 &&
+      instant.getUTCFullYear() === Number(match[1]) &&
+      instant.getUTCMonth() + 1 === Number(match[2]) &&
+      instant.getUTCDate() === Number(match[3]) &&
+      instant.getUTCHours() === Number(match[4]) &&
+      instant.getUTCMinutes() === Number(match[5]) &&
+      instant.getUTCSeconds() === Number(match[6])
+    );
+    if (!validUtc) errors.push('timestamp_utc must be a real UTC ISO timestamp with seconds and a trailing Z');
   }
   if ('duration_ms' in event && (typeof event.duration_ms !== 'number' || !Number.isFinite(event.duration_ms) || event.duration_ms < 0)) errors.push('duration_ms must be a non-negative finite number');
   if ('retry_count' in event && (!Number.isInteger(event.retry_count) || event.retry_count < 0)) errors.push('retry_count must be a non-negative integer');
