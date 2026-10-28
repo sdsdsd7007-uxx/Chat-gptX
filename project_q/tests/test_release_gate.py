@@ -29,7 +29,7 @@ def sign_record(record):
     record["approval"]["artifact_digest"] = canonical_digest(record)
     record["approval"]["key_id"] = "test-approver-01"
     record["approval"]["policy_version"] = "1.2.0"
-    record["approval"]["not_before"] = "2026-10-28T11:00:00Z"
+    record["approval"].setdefault("not_before", "2026-10-28T11:00:00Z")
     record["approval"]["signature"] = base64.b64encode(
         TEST_PRIVATE_KEY.sign(approval_signature_payload(canonical_digest(record), record["approval"]))
     ).decode("ascii")
@@ -135,7 +135,7 @@ class ReleaseGateTests(unittest.TestCase):
         record = valid_record()
         record["recovery"]["status"] = "untested"
         record = sign_record(record)
-        self.assertIn("RECOVERY_NOT_TESTED_OR_PLAN_MISSING", evaluate(record, now=NOW).blockers)
+        self.assertIn("RECOVERY_TEST_EVIDENCE_MISSING_OR_UNVERIFIED", evaluate(record, now=NOW).blockers)
 
     def test_production_always_blocked_by_reference_gate(self):
         record = valid_record()
