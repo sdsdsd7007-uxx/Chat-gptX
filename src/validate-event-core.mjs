@@ -31,7 +31,7 @@ export function validateEvent(event) {
   }
   if ('timestamp_utc' in event) {
     const timestamp = event.timestamp_utc;
-    const strictUtc = typeof timestamp === 'string' && /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$/.test(timestamp) && !Number.isNaN(Date.parse(timestamp));
+    const strictUtc = typeof timestamp === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(timestamp) && !Number.isNaN(Date.parse(timestamp));
     if (!strictUtc) errors.push('timestamp_utc must be a valid UTC ISO timestamp with seconds and a trailing Z');
   }
   if ('duration_ms' in event && (typeof event.duration_ms !== 'number' || !Number.isFinite(event.duration_ms) || event.duration_ms < 0)) errors.push('duration_ms must be a non-negative finite number');
