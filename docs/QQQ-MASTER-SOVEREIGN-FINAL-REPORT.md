@@ -15,10 +15,10 @@ This report therefore separates **documented design**, **verified repository tes
 
 - Repository: `sdsdsd7007-uxx/Chat-gptX`
 - Branch: `feature/qz-hardening-recommendations`
-- Latest verified commit at the time of this report snapshot: `6dc5307ce48c2817b469887f342566a9f4d82dd2`
+- Latest verified commit at the time of this report snapshot: `9c8d363cd28d7a9f43576e633a12fa8501b06100`
 - PR #5: open, draft, not merged: https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/5
-- Pull-request workflow: run `40692378919`, **success** on the commit above: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40692378919
-- Push workflow: run `40692369213`, **success** on the same commit: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40692369213
+- Pull-request workflow: run `40692515297`, **success** on the commit above: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40692515297
+- Push workflow: run `40692507037`, **success** on the same commit: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40692507037
 - Passing check: `telemetry-contract-tests` in both runs.
 - Existing repository artifacts include the telemetry schema, validator, regression tests, QQQ v53 master framework, QQQ v53.2 master inventory, QQQ-SP1 charter, AI sub-project charters, comparative evaluation plan, operations matrix, Autopilot protocol, StudyCore, Jassim Sultan leadership study, historical-change synthesis, Next-Cycle charter and the Intelligence/Recommendation Engine contract.
 
@@ -93,4 +93,4 @@ The local artifact `QQQ_v53_2_Study_Knowledge_Dashboard.html` contains a Next-Cy
 
 Default the next bounded cycle to **QQQ-StudyCore → QQQ-ISP-JassimSultan-Leadership**: verify the exact book edition and official contents, reconcile the provisional leadership-series bibliography/programmes, then produce source-linked original notes and learning checks with page/section references. The Recommendation Engine should separately prioritize each next step based on evidence, value, feasibility, risk/reversibility and learning value.
 
-**Updated evidence boundary:** CI is confirmed on commit `6dc5307ce48c2817b469887f342566a9f4d82dd2`; after any later commit, check current-head CI before calling it verified. PR #5 remains draft/open/unmerged, live operations remain UNKNOWN, and production stays HOLD.
+**Updated evidence boundary:** CI is confirmed on commit `9c8d363cd28d7a9f43576e633a12fa8501b06100`; after any later commit, check current-head CI before calling it verified. PR #5 remains draft/open/unmerged, live operations remain UNKNOWN, and production stays HOLD.
