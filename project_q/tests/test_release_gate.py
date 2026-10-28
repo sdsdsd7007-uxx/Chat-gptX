@@ -236,6 +236,18 @@ class ReleaseGateTests(unittest.TestCase):
         record["audit"] = {"unexpected_admin_override": True}
         self.assertFalse(evaluate(record, now=NOW).allowed)
 
+    def test_digest_stable_for_object_key_order(self):
+        record = valid_record()
+        reordered = dict(reversed(list(record.items())))
+        self.assertEqual(canonical_digest(record), canonical_digest(reordered))
+
+    def test_non_finite_number_fails_closed(self):
+        record = valid_record()
+        record["description"] = float("nan")
+        decision = evaluate(record, now=NOW)
+        self.assertFalse(decision.allowed)
+        self.assertIn("POLICY_EVALUATION_ERROR:ValueError", decision.blockers)
+
     def test_tampered_signature_fails_closed(self):
         record = valid_record()
         record["approval"]["signature"] = base64.b64encode(b"x" * 64).decode("ascii")
