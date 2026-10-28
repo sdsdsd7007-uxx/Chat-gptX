@@ -5,6 +5,8 @@ This repository contribution is a **reviewable, non-production foundation**. It 
 ## Components
 - `schemas/evidence-record.schema.json`: JSON Schema Draft 2020-12 contract.
 - `src/project_q/release_gate.py`: fail-closed evidence and approval policy evaluator.
+- `src/project_q/replay_ledger.py`: SQLite-backed atomic one-time approval/nonce consumption reference component.
+- `tests/test_replay_ledger.py`: uniqueness, concurrency and fail-closed replay-ledger tests.
 - `tests/test_release_gate.py`: allow/deny tests, including signature-tampering cases.
 - `.github/workflows/project-q-checks.yml`: pull-request validation workflow with immutable action references.
 - `.github/dependabot.yml`: weekly GitHub Actions dependency update proposals.
@@ -43,3 +45,10 @@ Never label a claim `VEF` without a recorded verification method and supporting 
 The current security-hardening branch requires source provenance and verifier identity, binds policy version and approval validity window into the Ed25519 signature, accepts an explicit revoked-key set, and requires a recovery-test evidence reference when recovery is required. See [Trust and Approval Lifecycle](TRUST_AND_APPROVAL_LIFECYCLE.md).
 
 The revocation set and trusted public-key map are caller-supplied controls, not a deployed key-management service. Identity proofing, key custody, rotation, revocation freshness, trusted time, and audit operations remain external prerequisites. This evaluator remains non-production and blocks production promotion.
+
+
+## Signed approval replay protection — reference component
+
+Policy v1.2.0 approval envelopes now require signed `approval_id` and `nonce` claims. The separate `replay_ledger.py` component atomically consumes each identifier once using SQLite transactions and unique constraints. A concurrent test verifies that only one of eight attempts using the same nonce can succeed.
+
+**Important limitations:** this is a local SQLite reference component for isolated non-production evaluation. It is not a distributed replay service, does not authenticate the trust bundle, does not itself verify approval signatures, and does not provide multi-region consistency, operational backup/restore, tamper-evident audit, or production-grade access control. The caller must first obtain an allowed policy decision using a fresh authenticated trust/revocation state and then pass the exact signed approval claims to the ledger. A denied policy decision is never consumed. Storage errors fail closed. Do not use this SQLite implementation as a production authorization service without independent design review and operational controls.
