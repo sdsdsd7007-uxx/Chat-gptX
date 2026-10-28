@@ -12,14 +12,15 @@ Independently assess the provenance requirements, approval envelope, signature b
 Independent Python application-security and applied-cryptography experience; familiarity with JSON Schema, authorization systems and GitHub Actions. Reviewer should be independent of the implementation author and disclose conflicts.
 
 ## Review scope
-1. JSON Schema: root and nested source-record provenance; source URL/document alternatives; verifier identity and timestamp; recovery evidence reference.
+1. JSON Schema: root and nested source-record provenance; equality of source-record lists; non-empty source URL/document alternatives; verifier identity and timestamp; constrained audit object; unique non-empty approval scopes; recovery evidence reference.
 2. Cryptographic binding: artifact digest, approval status/reference, environment, scopes, policy version, key ID, not-before and expiry.
 3. Revocation: behavior when key ID is revoked; freshness, authenticity and emergency propagation of the external revocation source.
-4. Time: timezone handling, exact validity boundaries, expiry ordering and clock-skew assumptions.
+4. Time: timezone handling, exact validity boundaries, expiry ordering, future-dated evidence rejection and clock-skew assumptions.
 5. Trust model: signer identity proofing, key custody, rotation, compromise, historical verification and separation of duties.
 6. Recovery: verify that referenced recovery evidence is authentic, current and from the relevant environment.
-7. CI/repository: workflow permissions, untrusted PR boundaries, immutable action pins, branch protection and required status checks.
-8. Regression coverage and compatibility implications of policy version 1.2.0.
+7. Serialization: deterministic Python JSON profile, key-order invariance, non-finite number rejection, Unicode/numeric edge cases, and the limits of cross-language compatibility (not RFC 8785/JCS).
+8. CI/repository: workflow permissions, untrusted PR boundaries, immutable action pins, branch protection and required status checks.
+9. Regression coverage and compatibility implications of policy version 1.2.0.
 
 ## Adversarial cases
 - Missing or empty source references, verifier identity or timestamps.
