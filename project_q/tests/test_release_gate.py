@@ -234,6 +234,26 @@ class ReleaseGateTests(unittest.TestCase):
         record["approval"]["scopes"] = ["release", "release"]
         self.assertFalse(evaluate(record, now=NOW).allowed)
 
+    def test_duplicate_root_source_records_rejected_by_schema(self):
+        record = valid_record()
+        record["source_records"] = ["fixture://synthetic/001", "fixture://synthetic/001"]
+        self.assertFalse(evaluate(record, now=NOW).allowed)
+
+    def test_duplicate_evidence_source_records_rejected_by_schema(self):
+        record = valid_record()
+        record["evidence"]["source_records"] = ["fixture://synthetic/001", "fixture://synthetic/001"]
+        self.assertFalse(evaluate(record, now=NOW).allowed)
+
+    def test_whitespace_only_provenance_rejected_by_schema(self):
+        record = valid_record()
+        record["evidence"]["source_document"] = "   "
+        self.assertFalse(evaluate(record, now=NOW).allowed)
+
+    def test_whitespace_only_verification_method_rejected_by_schema(self):
+        record = valid_record()
+        record["evidence"]["verification_method"] = "   "
+        self.assertFalse(evaluate(record, now=NOW).allowed)
+
     def test_unknown_audit_field_rejected_by_schema(self):
         record = valid_record()
         record["audit"] = {"unexpected_admin_override": True}
