@@ -34,7 +34,7 @@ def consume_approval(database, *, approval, decision, consumed_at=None):
         return ConsumptionResult(False, "NONCE_INVALID")
     if not isinstance(digest, str) or re.fullmatch(r"[a-f0-9]{64}", digest) is None:
         return ConsumptionResult(False, "RECORD_DIGEST_INVALID")
-    if not isinstance(version, str) or re.fullmatch(r"[0-9]+\\.[0-9]+\\.[0-9]+", version) is None:
+    if not isinstance(version, str) or len(version.split(".")) != 3 or any(not part.isdigit() for part in version.split(".")):
         return ConsumptionResult(False, "POLICY_VERSION_INVALID")
     stamp = consumed_at or datetime.now(timezone.utc)
     if stamp.tzinfo is None or stamp.utcoffset() is None:
