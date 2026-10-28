@@ -7,14 +7,14 @@
 ## 1. Evidence provenance
 
 An evidence record must include:
-- at least one source-record reference;
-- a source URL or source-document reference;
-- retrieval timestamp;
+- at least one source-record reference at the registry and evidence levels, with both lists required to match;
+- a non-empty source URL or source-document reference;
+- retrieval timestamp and verification timestamp that are not in the future at evaluation time;
 - verification status and method;
 - verifier identity and verification timestamp;
 - confidence and limitations.
 
-A `VEF` classification is a claim that must be supported by the recorded provenance. The schema validates presence and shape; it does not independently establish source authenticity, verifier competence, or truth.
+A `VEF` classification is a claim that must be supported by the recorded provenance. The schema validates presence and shape, constrains audit metadata, and the evaluator cross-checks the two source-record lists. It does not independently establish source authenticity, verifier competence, or truth.
 
 ## 2. Approval envelope
 
