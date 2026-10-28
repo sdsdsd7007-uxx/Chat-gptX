@@ -53,19 +53,24 @@ def verify_approval_signature(
     trusted_approval_keys: Mapping[str, bytes] | None,
 ) -> bool:
     """Verify Ed25519 against an externally provisioned trusted public-key registry."""
-    if not isinstance(trusted_approval_keys, Mapping):
+    if not isinstance(approval, Mapping) or not isinstance(trusted_approval_keys, Mapping):
         return False
-    public_key_bytes = trusted_approval_keys.get(approval["key_id"])
-    if not isinstance(public_key_bytes, bytes) or len(public_key_bytes) != 32:
+    key_id = approval.get("key_id")
+    encoded_signature = approval.get("signature")
+    if not isinstance(key_id, str) or not key_id or not isinstance(encoded_signature, str):
         return False
     try:
-        signature = base64.b64decode(approval["signature"], validate=True)
+        public_key_bytes = trusted_approval_keys.get(key_id)
+        if not isinstance(public_key_bytes, bytes) or len(public_key_bytes) != 32:
+            return False
+        signature = base64.b64decode(encoded_signature, validate=True)
         if len(signature) != 64:
             return False
         public_key = Ed25519PublicKey.from_public_bytes(public_key_bytes)
-        public_key.verify(signature, approval_signature_payload(record_digest, approval))
+        public_key.verify(signature, approval_signature_payload(record_digest, dict(approval)))
         return True
-    except (ValueError, TypeError, InvalidSignature):
+    except Exception:
+        # This helper is fail-closed even when called outside evaluate_release.
         return False
 
 
