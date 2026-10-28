@@ -4,8 +4,9 @@
 This is an isolated, synthetic-data-only engineering pilot. It performs no network access, persistent writes, account synchronization, external publishing, or production operations. Never place personal, customer, credential, health, or other sensitive data in these fixtures.
 
 ## Components
-- `src/project_z/telemetry.py`: strict JSONL validation, duplicate-ID rejection, and deterministic lexical retrieval baseline.
-- `tests/test_telemetry.py`: validation, rejection, and search behavior tests.
+- `src/project_z/telemetry.py`: strict JSONL validation, duplicate-ID rejection, bounded aggregate input and deterministic lexical retrieval baseline.
+- `tests/test_telemetry.py`: validation, rejection, resource-bound and search behavior tests.
+- `SECURITY_DEPENDENCY_PERFORMANCE_REVIEW.md`: implementation-author review and production promotion gates.
 - `fixtures/synthetic-events.jsonl`: tiny, fabricated sample dataset.
 - `benchmarks/run_benchmark.py`: reproducible ingestion and lexical-search microbenchmark.
 - `src/project_z/evaluation.py`: offline precision@k, recall@k, MRR, and nDCG@k evaluation.
@@ -22,8 +23,9 @@ PYTHONPATH=project_z/src python project_z/benchmarks/run_benchmark.py --events 1
 2. Event IDs are unique within one ingestion batch.
 3. Required fields, timezone-aware timestamps, finite numeric values, and string-to-string tags are enforced.
 4. Retrieval is deterministic and explicitly lexical; it is not represented as vector or semantic search.
-5. Benchmark output reports median and p95 separately for ingestion and retrieval.
-6. The proposed 150 ms p95 objective is a measurement target only. Do not declare it met based on a single shared hosted runner or a tiny fixture. Establish a pinned hardware/runtime baseline, repeated runs, workload mix, and confidence intervals before adopting an SLO.
+5. Input is bounded to 16 MiB per batch, 10,000 rows and 65,536 characters per line; queries are limited to 4,096 characters and search scans at most 100,000 events.
+6. Benchmark output reports median and p95 separately for ingestion and retrieval.
+7. The proposed 150 ms p95 objective is a measurement target only. Do not declare it met based on a single shared hosted runner or a tiny fixture. Establish a pinned hardware/runtime baseline, repeated runs, workload mix, and confidence intervals before adopting an SLO.
 
 ## Next research/engineering options
 - **A — Keep lexical baseline:** simplest, transparent, low operational complexity.
