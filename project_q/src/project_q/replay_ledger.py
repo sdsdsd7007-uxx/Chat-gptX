@@ -44,7 +44,7 @@ def consume_approval(
         return ConsumptionResult(False, "NONCE_INVALID")
     if not isinstance(record_digest, str) or not _HEX_DIGEST.fullmatch(record_digest):
         return ConsumptionResult(False, "RECORD_DIGEST_INVALID")
-    if not isinstance(policy_version, str) or not re.fullmatch(r"[0-9]+\\.[0-9]+\\.[0-9]+", policy_version):
+    if not isinstance(policy_version, str) or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", policy_version):
         return ConsumptionResult(False, "POLICY_VERSION_INVALID")
 
     timestamp = consumed_at or datetime.now(timezone.utc)
