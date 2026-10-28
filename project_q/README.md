@@ -37,3 +37,9 @@ The evaluator is a reference policy component. It does not perform deployment. P
 - `HAC`: historical assistant claim
 
 Never label a claim `VEF` without a recorded verification method and supporting source.
+
+
+## Policy v1.2.0 hardening
+The current security-hardening branch requires source provenance and verifier identity, binds policy version and approval validity window into the Ed25519 signature, accepts an explicit revoked-key set, and requires a recovery-test evidence reference when recovery is required. See [Trust and Approval Lifecycle](TRUST_AND_APPROVAL_LIFECYCLE.md).
+
+The revocation set and trusted public-key map are caller-supplied controls, not a deployed key-management service. Identity proofing, key custody, rotation, revocation freshness, trusted time, and audit operations remain external prerequisites. This evaluator remains non-production and blocks production promotion.
