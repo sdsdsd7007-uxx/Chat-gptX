@@ -5,6 +5,9 @@ from unittest.mock import patch
 from project_z.telemetry import (
     MAX_LINE_CHARS,
     MAX_TAGS,
+    MAX_BATCH_BYTES,
+    MAX_QUERY_CHARS,
+    MAX_SEARCH_EVENTS,
     ingest_jsonl,
     search_events,
 )
@@ -106,6 +109,30 @@ class TelemetryTests(unittest.TestCase):
         self.assertEqual(len(result.accepted), 2)
         self.assertEqual(consumed, [0, 1, 2])
         self.assertIn("batch exceeds maximum", result.rejected[-1]["reason"])
+
+    def test_stops_consuming_after_total_byte_limit(self):
+        consumed = []
+        line = row("e-1")
+        with patch("project_z.telemetry.MAX_BATCH_BYTES", len(line.encode("utf-8")) + 1):
+            def source():
+                for index in range(4):
+                    consumed.append(index)
+                    yield row(f"e-{index}")
+            result = ingest_jsonl(source())
+        self.assertEqual(len(result.accepted), 1)
+        self.assertEqual(consumed, [0, 1])
+        self.assertIn("maximum total bytes", result.rejected[-1]["reason"])
+
+    def test_search_rejects_oversized_query(self):
+        with patch("project_z.telemetry.MAX_QUERY_CHARS", 3):
+            with self.assertRaises(ValueError):
+                search_events([], "long-query")
+
+    def test_search_rejects_oversized_corpus(self):
+        events = ingest_jsonl([row("e-1"), row("e-2"), row("e-3")]).accepted
+        with patch("project_z.telemetry.MAX_SEARCH_EVENTS", 2):
+            with self.assertRaises(ValueError):
+                search_events(events, "latency")
 
     def test_search_matches_metric_and_tags(self):
         events = ingest_jsonl([row("e-1"), row("e-2", metric="queue_depth", tags={"service": "worker"})]).accepted
