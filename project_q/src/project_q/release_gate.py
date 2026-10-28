@@ -111,6 +111,8 @@ def evaluate_release(
             blockers.append("VERIFICATION_STATUS_NOT_VERIFIED")
         if not evidence["source_records"] or not evidence["verified_by"].strip():
             blockers.append("EVIDENCE_PROVENANCE_INCOMPLETE")
+        if set(record["source_records"]) != set(evidence["source_records"]):
+            blockers.append("EVIDENCE_SOURCE_RECORDS_MISMATCH")
         if lifecycle["status"] != "verified":
             blockers.append("LIFECYCLE_NOT_VERIFIED")
         if risk["level"] in {"critical", "unknown", "high"}:
@@ -147,6 +149,10 @@ def evaluate_release(
                 blockers.append("APPROVAL_EXPIRED")
             if expires_at <= not_before:
                 blockers.append("APPROVAL_VALIDITY_WINDOW_INVALID")
+            verified_at = _parse_aware_datetime(evidence["verified_at"])
+            retrieved_at = _parse_aware_datetime(evidence["retrieved_at"])
+            if verified_at > current_utc or retrieved_at > current_utc:
+                blockers.append("EVIDENCE_TIMESTAMP_IN_FUTURE")
 
         if recovery["required"] and (
             recovery["status"] != "tested"
