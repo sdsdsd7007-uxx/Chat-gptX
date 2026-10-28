@@ -17,13 +17,19 @@ This repository contains a small, dependency-free foundation for validating tele
 - [Online Operations Matrix](docs/ONLINE-OPERATIONS-MATRIX.md)
 - [Validation Hardening Plan](docs/VALIDATION-HARDENING-PLAN.md)
 - [Autopilot Engine Protocol](docs/AUTOPILOT-ENGINE-PROTOCOL.md)
+- [QQQ Next-Cycle Steering Charter](docs/QQQ-ISP-NEXT-CYCLE-CHARTER.md)
+- [Intelligence + Recommendation Engine Contract](docs/QQQ-INTELLIGENCE-AND-RECOMMENDATION-ENGINES.md)
 
 ## Study & Knowledge Assimilation
 - [QQQ-Study & Knowledge Assimilation Core](docs/QQQ-STUDY-KNOWLEDGE-CORE.md)
 - [QQQ-ISP-JassimSultan-Leadership Project](docs/QQQ-ISP-JASSIMSULTAN-LEADERSHIP.md)
 - [First Strategic Thinking Executive Synthesis](docs/QQQ-JS-ST-01-EXECUTIVE-SYNTHESIS.md)
+- [Second Synthesis: Historical Change & Societal Renewal](docs/QQQ-JS-HL-02-HISTORICAL-LAWS-SYNTHESIS.md)
 
-The Jassim Sultan study project uses the author's official description and published contents as the initial evidence base. The first synthesis is an original high-level summary, not a substitute for the book; full chapter-by-chapter study and reconciliation of the complete book/programme catalogue remain in progress.
+The Jassim Sultan study project uses official author descriptions and published contents as its initial evidence base. The syntheses are original study notes, not substitutes for the books; full chapter-by-chapter study and reconciliation of the complete book/programme catalogue remain in progress.
+
+## Intelligence & recommendation cycle
+The Next-Cycle design separates an evidence-based Intelligence Engine (all analysis phases and report) from a Recommendation Engine (options, priority, risk, acceptance criteria and rollback), followed by a bounded next-cycle decision. The dashboard's local cycle simulator does not fetch live sources, call external APIs or execute recommendations.
 
 ## NextGen AI project family
 - [NextGen AI Ecosystem](docs/QQQ-SP-NEXTGEN-AI-ECOSYSTEM.md)
