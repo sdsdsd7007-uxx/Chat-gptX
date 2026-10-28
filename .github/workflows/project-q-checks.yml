@@ -5,6 +5,16 @@ on:
     paths:
       - "project_q/**"
       - "project_z/**"
+      - "portfolio/**"
+      - ".github/workflows/project-q-checks.yml"
+      - ".github/dependabot.yml"
+  push:
+    branches:
+      - "project-q/controlled-foundation"
+    paths:
+      - "project_q/**"
+      - "project_z/**"
+      - "portfolio/**"
       - ".github/workflows/project-q-checks.yml"
       - ".github/dependabot.yml"
   workflow_dispatch:
