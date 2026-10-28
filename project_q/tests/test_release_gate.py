@@ -177,6 +177,13 @@ class ReleaseGateTests(unittest.TestCase):
         )
         self.assertIn("REVOCATION_STATUS_UNAVAILABLE", decision.blockers)
 
+    def test_missing_revocation_status_fails_closed(self):
+        decision = evaluate_release(
+            valid_record(), trusted_approval_keys=TRUSTED_TEST_KEYS, now=NOW
+        )
+        self.assertIn("REVOCATION_STATUS_UNAVAILABLE", decision.blockers)
+        self.assertFalse(decision.allowed)
+
     def test_revoked_approval_key_blocked(self):
         decision = evaluate_release(
             valid_record(), trusted_approval_keys=TRUSTED_TEST_KEYS,
