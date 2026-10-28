@@ -96,7 +96,7 @@ def _hash_open_fd(fd: int) -> str:
 
 def _scan_directory(dir_fd: int, prefix: str, *, run_id: str,
                     source_system: str, rows: list[dict[str, Any]],
-                    hash_to_paths: dict[str, list[str]]) -> None:
+                    hash_to_paths: dict[str, list[str]], root_device: int) -> None:
     # scandir(fd) is anchored to the already-open directory, not a reconstructed path.
     with os.scandir(dir_fd) as iterator:
         names = sorted(entry.name for entry in iterator)
@@ -120,6 +120,10 @@ def _scan_directory(dir_fd: int, prefix: str, *, run_id: str,
             rows.append(_row(run_id, source_system, relative, name, "symlink",
                              validation="exception", exception="SYMLINK_REJECTED_NOT_FOLLOWED"))
             continue
+        if item_stat.st_dev != root_device:
+            rows.append(_row(run_id, source_system, relative, name, "mount_or_device_boundary",
+                             validation="exception", exception="CROSS_DEVICE_ENTRY_REJECTED"))
+            continue
 
         if stat.S_ISDIR(item_stat.st_mode):
             row = _row(run_id, source_system, relative, name, "directory",
@@ -135,7 +139,7 @@ def _scan_directory(dir_fd: int, prefix: str, *, run_id: str,
                     raise InventoryError("opened directory changed type")
                 _scan_directory(child_fd, relative, run_id=run_id,
                                 source_system=source_system, rows=rows,
-                                hash_to_paths=hash_to_paths)
+                                hash_to_paths=hash_to_paths, root_device=root_device)
             except OSError as exc:
                 rows.append(_row(run_id, source_system, relative + "/",
                                  name, "exception", validation="exception",
@@ -231,7 +235,7 @@ def create_inventory(root_arg: str, output_arg: str, *, manifest_arg: str | None
         root_row["metadata_complete"] = "yes"
         rows.append(root_row)
         _scan_directory(root_fd, "", run_id=run_id, source_system=source_system,
-                        rows=rows, hash_to_paths=hash_to_paths)
+                        rows=rows, hash_to_paths=hash_to_paths, root_device=root_stat.st_dev)
     finally:
         os.close(root_fd)
 
