@@ -60,9 +60,30 @@ export function runStudyCycle(study, config) {
   const sourceReferences = nonEmptyStrings(study.sourceReferences);
   if (sourceReferences.length === 0) issues.push('at least one source reference is required');
   if (typeof study.confidence !== 'number' || !Number.isFinite(study.confidence) || study.confidence < 0 || study.confidence > 1) issues.push('confidence must be a number between 0 and 1');
-  const minimumConfidence = typeof config.minStudyConfidence === 'number' ? config.minStudyConfidence : 0.8;
-  if (typeof study.confidence === 'number' && study.confidence < minimumConfidence) issues.push('study confidence is below the configured approval threshold');
-  const subsystemAssessment = evaluateAllSubengines(study);
+  const minimumConfidence = config.minStudyConfidence === undefined ? 0.8 : config.minStudyConfidence;
+  if (typeof minimumConfidence !== 'number' || !Number.isFinite(minimumConfidence) || minimumConfidence < 0 || minimumConfidence > 1) {
+    issues.push('config minStudyConfidence must be a number between 0 and 1');
+  } else if (typeof study.confidence === 'number' && study.confidence < minimumConfidence) {
+    issues.push('study confidence is below the configured approval threshold');
+  }
+  const rawAssessment = evaluateAllSubengines(study);
+  const verifiedResults = rawAssessment.results.map((item) => {
+    const unregisteredReferences = item.evidenceReferences.filter((reference) => !sourceReferences.includes(reference));
+    if (unregisteredReferences.length === 0) return item;
+    return {
+      ...item,
+      status: 'NOT_VERIFIED',
+      decision: 'INVESTIGATE',
+      severity: item.engineId === 'MCU' || item.engineId === 'ARRE' ? 'CRITICAL' : 'HIGH',
+      reason: 'Subengine evidence references must be listed in study.sourceReferences.'
+    };
+  });
+  const subsystemAssessment = {
+    results: verifiedResults,
+    allClear: verifiedResults.every((item) => item.decision === 'CONTINUE'),
+    needsInvestigation: verifiedResults.some((item) => item.decision === 'INVESTIGATE'),
+    criticalFailures: verifiedResults.filter((item) => (item.engineId === 'MCU' || item.engineId === 'ARRE') && item.decision === 'INVESTIGATE').map((item) => item.engineId)
+  };
   if (subsystemAssessment.needsInvestigation) issues.push('one or more subengines are failed, unknown, or missing evidence');
   let updateProposal = null;
   const recommendation = study.recommendation;
