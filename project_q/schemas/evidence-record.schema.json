@@ -16,7 +16,8 @@
     "lifecycle",
     "risk",
     "approval",
-    "recovery"
+    "recovery",
+    "source_records"
   ],
   "properties": {
     "registry_id": {
@@ -58,16 +59,21 @@
     },
     "source_records": {
       "type": "array",
+      "minItems": 1,
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1
       }
     },
     "evidence": {
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "source_records",
         "verification_status",
         "verification_method",
+        "verified_by",
+        "verified_at",
         "confidence",
         "retrieved_at"
       ],
@@ -114,8 +120,28 @@
           "items": {
             "type": "string"
           }
+        },
+        "verified_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verified_at": {
+          "type": "string",
+          "format": "date-time"
         }
-      }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "source_url"
+          ]
+        },
+        {
+          "required": [
+            "source_document"
+          ]
+        }
+      ]
     },
     "lifecycle": {
       "type": "object",
@@ -189,7 +215,9 @@
         "scopes",
         "expires_at",
         "key_id",
-        "signature"
+        "signature",
+        "policy_version",
+        "not_before"
       ],
       "properties": {
         "status": {
@@ -232,6 +260,13 @@
         "signature": {
           "type": "string",
           "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+        },
+        "policy_version": {
+          "const": "1.2.0"
+        },
+        "not_before": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -241,7 +276,8 @@
       "required": [
         "required",
         "status",
-        "plan"
+        "plan",
+        "test_evidence_ref"
       ],
       "properties": {
         "required": {
@@ -257,6 +293,10 @@
         },
         "plan": {
           "type": "string"
+        },
+        "test_evidence_ref": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
