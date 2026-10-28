@@ -36,7 +36,7 @@ Severity labels above describe the impact if the reference implementation were u
 
 ## Verification evidence
 
-Earlier CI run #105 passed on head `25fa11ca149646533cd93b0b6f5ba453fb6c1799`: Project Q 42/42, Project Z 25/25, total 67/67. The 500-event synthetic benchmark (30 repetitions) reported ingestion median/p95 5.241/5.595 ms, lexical search 1.207/1.314 ms, and combined pipeline 6.455/6.854 ms. This is historical evidence for that earlier head only; it does not verify the later provenance-schema, regression-test, CODEOWNERS or workflow-trigger changes. A fresh CI run on the final head is required before this review record can be considered current. These hosted-runner microbenchmarks are not representative workload or production SLO evidence. Runs #98–#102 exposed replay-ledger interface and semantic-version validation defects; both were corrected before run #105.
+CI run #117 passed on final reviewed head `d86a54d953c13b52d6fdb1b17f487aba98c835f9`: Project Q 46/46 tests, Project Z 25/25 tests, total 71/71. The controlled benchmark smoke test also completed successfully (500 synthetic events, 30 repetitions); exact timing values are not asserted here because the run summary inspected did not expose its numeric output. This is a hosted-runner synthetic check, not representative workload or production SLO evidence. Runs #98–#102 exposed replay-ledger interface and semantic-version validation defects; both were corrected before the passing final-head run.
 
 ## Independent review required
 
