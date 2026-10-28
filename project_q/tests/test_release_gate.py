@@ -13,6 +13,7 @@ from project_q.release_gate import (
     approval_signature_payload,
     canonical_digest,
     evaluate_release,
+    verify_approval_signature,
 )
 
 
@@ -259,6 +260,10 @@ class ReleaseGateTests(unittest.TestCase):
         record["evidence"]["verified_at"] = "2026-10-29T00:00:00Z"
         record = sign_record(record)
         self.assertIn("EVIDENCE_TIMESTAMP_IN_FUTURE", evaluate(record, now=NOW).blockers)
+
+    def test_signature_helper_rejects_malformed_approval(self):
+        self.assertFalse(verify_approval_signature("0" * 64, {}, TRUSTED_TEST_KEYS))
+        self.assertFalse(verify_approval_signature("0" * 64, {"key_id": "test-approver-01"}, TRUSTED_TEST_KEYS))
 
     def test_tampered_signature_fails_closed(self):
         record = valid_record()
