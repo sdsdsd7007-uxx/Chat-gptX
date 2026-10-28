@@ -28,6 +28,8 @@ TRUSTED_TEST_KEYS = {"test-approver-01": TEST_PUBLIC_KEY}
 def sign_record(record):
     record["approval"]["artifact_digest"] = canonical_digest(record)
     record["approval"]["key_id"] = "test-approver-01"
+    record["approval"]["policy_version"] = "1.2.0"
+    record["approval"]["not_before"] = "2026-10-28T11:00:00Z"
     record["approval"]["signature"] = base64.b64encode(
         TEST_PRIVATE_KEY.sign(approval_signature_payload(canonical_digest(record), record["approval"]))
     ).decode("ascii")
@@ -46,7 +48,11 @@ def valid_record():
         "description": "Non-sensitive synthetic record for policy tests.",
         "source_records": ["fixture://synthetic/001"],
         "evidence": {
+            "source_document": "fixture://synthetic/001",
+            "source_records": ["fixture://synthetic/001"],
             "retrieved_at": "2026-10-28T11:00:00Z",
+            "verified_by": "independent-test-fixture",
+            "verified_at": "2026-10-28T11:00:00Z",
             "verification_status": "verified",
             "verification_method": "deterministic-fixture-check",
             "confidence": 1.0,
@@ -61,10 +67,12 @@ def valid_record():
             "environment": "test",
             "scopes": ["release"],
             "expires_at": "2026-10-29T12:00:00Z",
+            "not_before": "2026-10-28T11:00:00Z",
+            "policy_version": "1.2.0",
             "key_id": "test-approver-01",
             "signature": ""
         },
-        "recovery": {"required": True, "status": "tested", "plan": "Restore the isolated test fixture."}
+        "recovery": {"required": True, "status": "tested", "plan": "Restore the isolated test fixture.", "test_evidence_ref": "fixture://recovery/test-001"}
     }
     return sign_record(record)
 
@@ -160,6 +168,44 @@ class ReleaseGateTests(unittest.TestCase):
         record = valid_record()
         record["approval"]["expires_at"] = "2027-10-29T12:00:00Z"
         self.assertIn("APPROVAL_SIGNATURE_INVALID_OR_UNTRUSTED", evaluate(record, now=NOW).blockers)
+
+
+    def test_revoked_approval_key_blocked(self):
+        decision = evaluate_release(
+            valid_record(), trusted_approval_keys=TRUSTED_TEST_KEYS,
+            revoked_approval_key_ids={"test-approver-01"}, now=NOW
+        )
+        self.assertIn("APPROVAL_KEY_REVOKED", decision.blockers)
+
+    def test_approval_not_yet_valid_blocked(self):
+        record = valid_record()
+        record["approval"]["not_before"] = "2026-10-29T12:00:00Z"
+        record = sign_record(record)
+        self.assertIn("APPROVAL_NOT_YET_VALID", evaluate(record, now=NOW).blockers)
+
+    def test_policy_version_is_signature_bound(self):
+        record = valid_record()
+        record["approval"]["policy_version"] = "1.1.0"
+        blockers = evaluate(record, now=NOW).blockers
+        self.assertIn("APPROVAL_POLICY_VERSION_MISMATCH", blockers)
+        self.assertIn("APPROVAL_SIGNATURE_INVALID_OR_UNTRUSTED", blockers)
+
+    def test_missing_source_provenance_blocked_by_schema(self):
+        record = valid_record()
+        del record["evidence"]["source_records"]
+        self.assertFalse(evaluate(record, now=NOW).allowed)
+
+    def test_missing_recovery_test_evidence_blocked_by_schema(self):
+        record = valid_record()
+        del record["recovery"]["test_evidence_ref"]
+        self.assertFalse(evaluate(record, now=NOW).allowed)
+
+    def test_invalid_approval_window_blocked(self):
+        record = valid_record()
+        record["approval"]["not_before"] = "2026-10-29T12:00:00Z"
+        record["approval"]["expires_at"] = "2026-10-28T12:00:00Z"
+        record = sign_record(record)
+        self.assertIn("APPROVAL_VALIDITY_WINDOW_INVALID", evaluate(record, now=NOW).blockers)
 
     def test_tampered_signature_fails_closed(self):
         record = valid_record()
