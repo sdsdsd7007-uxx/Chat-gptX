@@ -43,5 +43,5 @@ jobs:
         run: PYTHONPATH=project_q/src python -m unittest discover -s project_q/tests -v
       - name: Test Project Z synthetic telemetry
         run: PYTHONPATH=project_z/src python -m unittest discover -s project_z/tests -v
-      - name: Run synthetic benchmark smoke test
-        run: PYTHONPATH=project_z/src python project_z/benchmarks/run_benchmark.py --events 500 --iterations 5
+      - name: Run synthetic benchmark smoke test (30 repetitions)
+        run: PYTHONPATH=project_z/src python project_z/benchmarks/run_benchmark.py --events 500 --iterations 30
