@@ -34,3 +34,8 @@ test('rejects non-boolean reconciliation metadata', () => {
   assert.equal(result.valid, false);
   assert.ok(result.errors.some((item) => item.includes('reconciled must be boolean')));
 });
+test('rejects impossible calendar dates', () => {
+  const result = validateEvent({ ...event(), timestamp_utc:'2026-02-31T09:00:00Z' });
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((item) => item.includes('timestamp_utc')));
+});
