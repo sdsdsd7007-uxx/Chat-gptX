@@ -1,0 +1,26 @@
+[
+  {
+    "query": "request latency",
+    "relevant_event_ids": [
+      "fixture-001"
+    ]
+  },
+  {
+    "query": "queue depth worker",
+    "relevant_event_ids": [
+      "fixture-002"
+    ]
+  },
+  {
+    "query": "error count catalog",
+    "relevant_event_ids": [
+      "fixture-003"
+    ]
+  },
+  {
+    "query": "catalog request latency",
+    "relevant_event_ids": [
+      "fixture-001"
+    ]
+  }
+]

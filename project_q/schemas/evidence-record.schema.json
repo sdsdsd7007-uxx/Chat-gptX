@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/project-q/evidence-record.schema.json",
+  "title": "Project Q Evidence Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "registry_id",
+    "registry_version",
+    "project_id",
+    "component_id",
+    "record_type",
+    "classification",
+    "title",
+    "evidence",
+    "lifecycle",
+    "risk",
+    "approval",
+    "recovery"
+  ],
+  "properties": {
+    "registry_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "registry_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "component_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "record_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "classification": {
+      "enum": [
+        "SRC",
+        "VEF",
+        "PRO",
+        "PEN",
+        "UNK",
+        "HAC"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "source_records": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verification_status",
+        "verification_method",
+        "confidence",
+        "retrieved_at"
+      ],
+      "properties": {
+        "source_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "source_document": {
+          "type": "string"
+        },
+        "publication_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "data_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "verification_status": {
+          "enum": [
+            "verified",
+            "unverified",
+            "conflicting",
+            "stale",
+            "unknown"
+          ]
+        },
+        "verification_method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "environment"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "proposed",
+            "documented",
+            "verified",
+            "pending",
+            "blocked",
+            "retired"
+          ]
+        },
+        "environment": {
+          "enum": [
+            "local",
+            "test",
+            "staging",
+            "production"
+          ]
+        },
+        "owner": {
+          "type": "string"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical",
+            "unknown"
+          ]
+        },
+        "risk_register_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reference",
+        "artifact_digest",
+        "environment",
+        "scopes",
+        "expires_at",
+        "key_id",
+        "signature"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_requested",
+            "pending",
+            "approved",
+            "rejected"
+          ]
+        },
+        "reference": {
+          "type": "string"
+        },
+        "artifact_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "environment": {
+          "enum": [
+            "local",
+            "test",
+            "staging",
+            "production"
+          ]
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "key_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signature": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "status",
+        "plan"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "tested",
+            "untested",
+            "unavailable",
+            "not_applicable"
+          ]
+        },
+        "plan": {
+          "type": "string"
+        }
+      }
+    },
+    "audit": {
+      "type": "object"
+    }
+  }
+}

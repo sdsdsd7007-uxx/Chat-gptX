@@ -1,0 +1,47 @@
+name: Project Q and Project Z controlled checks
+
+on:
+  pull_request:
+    paths:
+      - "project_q/**"
+      - "project_z/**"
+      - "portfolio/**"
+      - ".github/workflows/project-q-checks.yml"
+      - ".github/dependabot.yml"
+  push:
+    branches:
+      - "project-q/controlled-foundation"
+    paths:
+      - "project_q/**"
+      - "project_z/**"
+      - "portfolio/**"
+      - ".github/workflows/project-q-checks.yml"
+      - ".github/dependabot.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-q-checks-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  controlled-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1, immutable commit
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0, immutable commit
+        with:
+          python-version: "3.11"
+      - name: Install Project Q test dependencies
+        run: python -m pip install -r project_q/requirements-dev.txt
+      - name: Test Project Q evidence gate
+        run: PYTHONPATH=project_q/src python -m unittest discover -s project_q/tests -v
+      - name: Test Project Z synthetic telemetry
+        run: PYTHONPATH=project_z/src python -m unittest discover -s project_z/tests -v
+      - name: Run synthetic benchmark smoke test (30 repetitions)
+        run: PYTHONPATH=project_z/src python project_z/benchmarks/run_benchmark.py --events 500 --iterations 30
