@@ -14,7 +14,10 @@ from typing import Iterable
 
 TOKEN_RE = re.compile(r"[a-z0-9]+")
 MAX_BATCH_LINES = 10_000
+MAX_BATCH_BYTES = 16 * 1024 * 1024
 MAX_LINE_CHARS = 65_536
+MAX_QUERY_CHARS = 4_096
+MAX_SEARCH_EVENTS = 100_000
 MAX_TAGS = 64
 MAX_FIELD_LENGTHS = {
     "event_id": 256,
@@ -110,6 +113,7 @@ def ingest_jsonl(lines: Iterable[str]) -> IngestionResult:
     accepted: list[TelemetryEvent] = []
     rejected: list[dict[str, object]] = []
     seen: set[str] = set()
+    total_bytes = 0
     for line_number, line in enumerate(lines, start=1):
         if line_number > MAX_BATCH_LINES:
             rejected.append({
@@ -122,6 +126,17 @@ def ingest_jsonl(lines: Iterable[str]) -> IngestionResult:
                 raise ValueError("JSONL line must be a string")
             if len(line) > MAX_LINE_CHARS:
                 raise ValueError("JSONL line exceeds maximum length")
+            try:
+                line_bytes = len(line.encode("utf-8"))
+            except UnicodeEncodeError:
+                raise ValueError("JSONL line is not valid UTF-8 text") from None
+            if total_bytes + line_bytes > MAX_BATCH_BYTES:
+                rejected.append({
+                    "line": line_number,
+                    "reason": "batch exceeds maximum total bytes; remaining input not consumed",
+                })
+                break
+            total_bytes += line_bytes
             raw = json.loads(line, object_pairs_hook=_unique_object)
             event = _validate_event(raw)
             if event.event_id in seen:
@@ -137,13 +152,17 @@ def search_events(events: Iterable[TelemetryEvent], query: str, limit: int = 10)
     """Small deterministic lexical baseline; not a semantic/vector search engine."""
     if not isinstance(query, str) or not query.strip():
         return []
+    if len(query) > MAX_QUERY_CHARS:
+        raise ValueError("query exceeds maximum length")
     if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1:
         raise ValueError("limit must be a positive integer")
     terms = set(TOKEN_RE.findall(query.lower()))
     if not terms:
         return []
     ranked: list[tuple[int, str, TelemetryEvent]] = []
-    for event in events:
+    for event_count, event in enumerate(events, start=1):
+        if event_count > MAX_SEARCH_EVENTS:
+            raise ValueError("search corpus exceeds maximum event count")
         text = " ".join([event.event_id, event.source, event.metric, event.unit, *event.tags.keys(), *event.tags.values()])
         overlap = len(terms.intersection(TOKEN_RE.findall(text.lower())))
         if overlap:
