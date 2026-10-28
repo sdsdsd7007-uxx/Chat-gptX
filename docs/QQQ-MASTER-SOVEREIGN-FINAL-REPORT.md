@@ -15,12 +15,12 @@ This report therefore separates **documented design**, **verified repository tes
 
 - Repository: `sdsdsd7007-uxx/Chat-gptX`
 - Branch: `feature/qz-hardening-recommendations`
-- Latest verified commit at the time of this report snapshot: `a35f81bd3a938f66de2d716879ce78824bf7ceda`
+- Latest verified commit at the time of this report snapshot: `6dc5307ce48c2817b469887f342566a9f4d82dd2`
 - PR #5: open, draft, not merged: https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/5
-- Pull-request workflow: run `40690292402`, **success** on the commit above: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40690292402
-- Push workflow: run `40690284008`, **success** on the same commit: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40690284008
+- Pull-request workflow: run `40692378919`, **success** on the commit above: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40692378919
+- Push workflow: run `40692369213`, **success** on the same commit: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40692369213
 - Passing check: `telemetry-contract-tests` in both runs.
-- Existing repository artifacts include the telemetry schema, validator, regression tests, QQQ v53 master framework, QQQ v53.2 master inventory, QQQ-SP1 charter, AI sub-project charters, comparative evaluation plan, operations matrix and Autopilot protocol.
+- Existing repository artifacts include the telemetry schema, validator, regression tests, QQQ v53 master framework, QQQ v53.2 master inventory, QQQ-SP1 charter, AI sub-project charters, comparative evaluation plan, operations matrix, Autopilot protocol, StudyCore, Jassim Sultan leadership study, historical-change synthesis, Next-Cycle charter and the Intelligence/Recommendation Engine contract.
 
 These CI results prove that the configured tests passed for the named commit. They do not prove service deployment, live connector health, disaster-prediction quality, PQC deployment, backup restoration or production readiness.
 
@@ -77,3 +77,20 @@ Scheduled Autopilot review is periodic review, not a continuously running 24/7 a
 Continue with the highest-value safe path: **keep production on HOLD; maintain the inventory and dashboard as evidence-led tools; finish the repeatable integration and recovery test gates; then request independent review**. Use measured availability, latency percentiles, data freshness, source coverage, recovery results and cost per accepted task rather than unsupported absolute claims.
 
 `THINK → ALIGN → TEST → VERIFY → REVIEW → IMPROVE → DONE × 3 → ∞`
+
+
+## 8. Next-Cycle intelligence and recommendation engines
+
+The new `QQQ-ISP-NEXT-CYCLE-CHARTER.md` and `QQQ-INTELLIGENCE-AND-RECOMMENDATION-ENGINES.md` define two separate logical engines:
+- **QQQ-Intelligence Engine:** receives and scopes the task, plans source ingestion, validates provenance and freshness, analyzes, synthesizes, assesses uncertainty/risk and produces a report.
+- **QQQ-Recommendation Engine:** consumes the report, compares options, explains priority and trade-offs, and proposes acceptance criteria, owner/reviewer roles, stop conditions and rollback.
+- **QQQ-ISP-NextGen-Steering:** proposes one bounded next cycle; it does not imply an infinite unattended process.
+- **Controlled Adaptation / Cross-Flows / Assurance:** draft versioned improvements, reconcile authorized integrations and enforce release/security gates.
+
+The local artifact `QQQ_v53_2_Study_Knowledge_Dashboard.html` contains a Next-Cycle tab with 11 phase rows, a local Intelligence Report JSON export, separate rule-based recommendations, and a next-cycle button. These are **local simulation features**: they do not fetch sources, call model APIs, connect to the cloud, execute recommendations or run in the background. Local JavaScript parsing passed; 108 DOM IDs had no duplicates and 73 unique literal `getElementById` targets had no missing elements. A headless Chromium attempt timed out, so interactive browser testing and visual rendering remain unverified.
+
+## 9. Current operating recommendation
+
+Default the next bounded cycle to **QQQ-StudyCore → QQQ-ISP-JassimSultan-Leadership**: verify the exact book edition and official contents, reconcile the provisional leadership-series bibliography/programmes, then produce source-linked original notes and learning checks with page/section references. The Recommendation Engine should separately prioritize each next step based on evidence, value, feasibility, risk/reversibility and learning value.
+
+**Updated evidence boundary:** CI is confirmed on commit `6dc5307ce48c2817b469887f342566a9f4d82dd2`; after any later commit, check current-head CI before calling it verified. PR #5 remains draft/open/unmerged, live operations remain UNKNOWN, and production stays HOLD.
