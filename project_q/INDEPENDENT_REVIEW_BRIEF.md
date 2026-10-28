@@ -113,3 +113,12 @@ This conclusion is not production deployment authorization. Any merge or release
 - The release evaluator blocks production; production would require a separately designed and reviewed release workflow.
 
 **Stop condition:** Any unresolved Critical or High security finding blocks approval for merge or deployment.
+
+## Expanded review scope — latest portfolio milestones
+The reviewer should also inspect these additions on the exact final head:
+- Inventory scanner: descriptor-relative traversal, O_NOFOLLOW symlink rejection, root/path containment, cross-device boundaries, directory/file records, SHA-256 manifest reproducibility and exclusive output creation.
+- Project Z: aggregate input-byte, query-length and search-corpus limits; malformed JSONL handling; lexical retrieval complexity; synthetic qrels; dependency/update policy; benchmark validity and limits.
+- Recovery: disposable local backup/restore simulation tests, corrupted-backup detection and symlink rejection. Confirm that the test is local-only and is not misrepresented as a Dropbox staging restore.
+- Portfolio evidence: distinguish completed code/CI from owner-only settings, external trust services, independent review and staging acceptance.
+
+Do not approve production use based on passing CI. Review all remaining limitations, including caller-supplied trust/revocation state, SR-10 replay-ledger trust boundary, absent identity proofing, trusted time, independent recovery-evidence verification, missing dependency lock/SBOM/vulnerability audit, and lack of real staging recovery evidence.
