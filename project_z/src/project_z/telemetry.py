@@ -128,7 +128,7 @@ def ingest_jsonl(lines: Iterable[str]) -> IngestionResult:
                 raise ValueError("duplicate event_id")
             seen.add(event.event_id)
             accepted.append(event)
-        except (json.JSONDecodeError, TypeError, ValueError, OverflowError) as exc:
+        except (json.JSONDecodeError, TypeError, ValueError, OverflowError, RecursionError) as exc:
             rejected.append({"line": line_number, "reason": str(exc)})
     return IngestionResult(tuple(accepted), tuple(rejected))
 
