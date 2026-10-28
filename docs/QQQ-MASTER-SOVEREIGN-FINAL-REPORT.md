@@ -15,10 +15,10 @@ This report therefore separates **documented design**, **verified repository tes
 
 - Repository: `sdsdsd7007-uxx/Chat-gptX`
 - Branch: `feature/qz-hardening-recommendations`
-- Commit verified when this snapshot was prepared: `ffbe184a54ca3f8ac711545a20177224b470c0e4`
+- Latest verified commit at the time of this report snapshot: `a35f81bd3a938f66de2d716879ce78824bf7ceda`
 - PR #5: open, draft, not merged: https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/5
-- Pull-request workflow: run `40689328114`, **success** on the commit above: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40689328114
-- Push workflow: run `40689319346`, **success** on the same commit: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40689319346
+- Pull-request workflow: run `40690292402`, **success** on the commit above: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40690292402
+- Push workflow: run `40690284008`, **success** on the same commit: https://github.com/sdsdsd7007-uxx/Chat-gptX/actions/runs/40690284008
 - Passing check: `telemetry-contract-tests` in both runs.
 - Existing repository artifacts include the telemetry schema, validator, regression tests, QQQ v53 master framework, QQQ v53.2 master inventory, QQQ-SP1 charter, AI sub-project charters, comparative evaluation plan, operations matrix and Autopilot protocol.
 
