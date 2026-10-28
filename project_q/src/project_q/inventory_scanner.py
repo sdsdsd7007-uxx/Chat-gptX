@@ -137,6 +137,8 @@ def _scan_directory(dir_fd: int, prefix: str, *, run_id: str,
                 opened_stat = os.fstat(child_fd)
                 if not stat.S_ISDIR(opened_stat.st_mode):
                     raise InventoryError("opened directory changed type")
+                if opened_stat.st_dev != root_device:
+                    raise InventoryError("opened directory crossed the source filesystem boundary")
                 _scan_directory(child_fd, relative, run_id=run_id,
                                 source_system=source_system, rows=rows,
                                 hash_to_paths=hash_to_paths, root_device=root_device)
@@ -164,6 +166,8 @@ def _scan_directory(dir_fd: int, prefix: str, *, run_id: str,
             opened_stat = os.fstat(file_fd)
             if not stat.S_ISREG(opened_stat.st_mode):
                 raise InventoryError("opened file is not regular")
+            if opened_stat.st_dev != root_device:
+                raise InventoryError("opened file crossed the source filesystem boundary")
             fd_to_hash = file_fd
             file_fd = None  # ownership transferred before hashing, including read failures
             checksum = _hash_open_fd(fd_to_hash)
