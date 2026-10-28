@@ -37,7 +37,7 @@ The evaluator currently accepts a caller-supplied public-key mapping and revoked
 
 The current evaluator checks signatures and time windows but does not provide durable replay prevention. A process-local set or in-memory cache is not an acceptable substitute.
 
-A production authorization service must atomically consume a unique approval identifier/nonce in a durable store. Suggested signed claims:
+A production authorization service must atomically consume a unique approval identifier/nonce in a durable store. A local SQLite reference implementation now exists in `project_q/src/project_q/replay_ledger.py`; it binds consumption to the evaluator's `GateDecision`, uses `BEGIN IMMEDIATE` and unique constraints, and is covered by concurrent-consumption tests. It remains a single-node non-production reference, not a distributed or production authorization service. Suggested signed claims:
 
 - approval_id: globally unique opaque identifier;
 - nonce: cryptographically random, unique per approval;
@@ -100,4 +100,4 @@ The connector used in this work can inspect branch-protection state but cannot a
 
 ## 6. Explicit non-claims
 
-This file is a design contract only. It does not implement a trust provider, key custody, identity proofing, revocation distribution, trusted time, durable nonce consumption, recovery-evidence verification, repository protection, independent review or production deployment.
+This file is a design contract. The repository now includes a non-production SQLite replay-ledger prototype, but it does not implement a trust provider, key custody, identity proofing, revocation distribution, trusted time, production-grade distributed nonce consumption, recovery-evidence verification, repository protection, independent review or production deployment.
