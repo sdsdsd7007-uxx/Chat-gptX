@@ -160,8 +160,9 @@ def _scan_directory(dir_fd: int, prefix: str, *, run_id: str,
             opened_stat = os.fstat(file_fd)
             if not stat.S_ISREG(opened_stat.st_mode):
                 raise InventoryError("opened file is not regular")
-            checksum = _hash_open_fd(file_fd)
-            file_fd = None  # ownership transferred to _hash_open_fd
+            fd_to_hash = file_fd
+            file_fd = None  # ownership transferred before hashing, including read failures
+            checksum = _hash_open_fd(fd_to_hash)
             row = _row(run_id, source_system, relative, name, "file",
                        size=opened_stat.st_size, modified=_utc_mtime(opened_stat.st_mtime_ns),
                        checksum=checksum, validation="file_metadata_and_hash_recorded")
