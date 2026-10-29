@@ -39,11 +39,11 @@ The following pull-request refs were inspected at their current known heads on 2
 
 | PR/ref | Workflow observed | Dependency references | Assessment |
 |---|---|---|---|
-| [PR #1](../..) / `project-q/controlled-foundation` | `.github/workflows/project-q-checks.yml` | `actions/checkout@<full SHA>`, `actions/setup-python@<full SHA>` | Step actions pinned to full commit SHAs; Dependabot configured weekly. |
-| [PR #2](../..) / `project-q/security-hardening-q-sec-02` | `.github/workflows/project-q-checks.yml` | `actions/checkout@<full SHA>`, `actions/setup-python@<full SHA>` | Step actions pinned to full commit SHAs; Dependabot configured weekly for GitHub Actions and pip. |
-| [PR #4](../..) / `feature/qz-assd-foundation` | `.github/workflows/qz-validation.yml` | `actions/checkout@v7`, `actions/setup-node@v7` | Tag references; recommend reviewed full-SHA pins or verified lockfile adoption. |
-| [PR #5](../..) and [PR #7](../..) | `.github/workflows/qz-validation.yml` | `actions/checkout@v7`, `actions/setup-node@v7` | Tag references; same hardening action. |
-| [PR #8](../..) and [PR #9](../..) | No `.github/workflows` found in inspected trees | None in these documentation branches | No exact-head CI runs returned for the inspected current heads; this is not evidence of passing tests. |
+| [PR #1](https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/1) / `project-q/controlled-foundation` | `.github/workflows/project-q-checks.yml` | `actions/checkout@<full SHA>`, `actions/setup-python@<full SHA>` | Step actions pinned to full commit SHAs; Dependabot configured weekly. |
+| [PR #2](https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/2) / `project-q/security-hardening-q-sec-02` | `.github/workflows/project-q-checks.yml` | `actions/checkout@<full SHA>`, `actions/setup-python@<full SHA>` | Step actions pinned to full commit SHAs; Dependabot configured weekly for GitHub Actions and pip. |
+| [PR #4](https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/4) / `feature/qz-assd-foundation` | `.github/workflows/qz-validation.yml` | `actions/checkout@v7`, `actions/setup-node@v7` | Tag references; recommend reviewed full-SHA pins or verified lockfile adoption. |
+| [PR #5](https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/5) and [PR #7](https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/7) | `.github/workflows/qz-validation.yml` | `actions/checkout@v7`, `actions/setup-node@v7` | Tag references; same hardening action. |
+| [PR #8](https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/8) and [PR #9](https://github.com/sdsdsd7007-uxx/Chat-gptX/pull/9) | No `.github/workflows` found in inspected trees | None in these documentation branches | No exact-head CI runs returned for the inspected current heads; this is not evidence of passing tests. |
 
 No remote reusable-workflow call of the form `jobs.<job_id>.uses` was found in the inspected workflow files. Therefore the upstream `gh-actions-lock` issue #179 gap is **not a confirmed current exposure for these inspected files**. Re-run this inventory when workflow files change. The known gap remains relevant if a future workflow invokes remote reusable workflows.
 
