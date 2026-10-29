@@ -224,3 +224,29 @@ test('approval must carry the exact fingerprint that was reviewed', () => {
   }), /approval fingerprint does not match the proposal/);
   assert.deepEqual(base, before);
 });
+
+test('post-approval changes to proposal identity, version, route, or status are rejected', () => {
+  const mutations = [
+    (proposal) => { proposal.proposalId = 'forged-proposal-id'; },
+    (proposal) => { proposal.studyId = 'substituted-study'; },
+    (proposal) => { proposal.baseConfigVersion = 2; },
+    (proposal) => { proposal.configPath = 'kpi.alertTolerancePercent'; },
+    (proposal) => { proposal.requestedBy = 'reviewer-2'; },
+    (proposal) => { proposal.status = 'BLOCKED'; }
+  ];
+
+  for (const mutate of mutations) {
+    const base = config();
+    const result = runStudyCycle(study(), base);
+    const proposal = structuredClone(result.updateProposal);
+    const approval = {
+      status:'approved', proposalId:proposal.proposalId, reviewerId:'reviewer-2',
+      proposalFingerprint:proposal.fingerprint, evidenceReference:'approval:123',
+      approvedAtUtc:'2026-10-28T10:00:00Z', baseConfigVersion:1
+    };
+    const before = structuredClone(base);
+    mutate(proposal);
+    assert.throws(() => applyApprovedEngineUpdate(base, proposal, approval));
+    assert.deepEqual(base, before);
+  }
+});
