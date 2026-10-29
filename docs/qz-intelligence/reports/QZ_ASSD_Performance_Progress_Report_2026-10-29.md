@@ -96,3 +96,30 @@ The observed QZ/ASSD validation pipeline is fast at the run level (p50 11s, p90 
 - [Upstream issue #179 — remote reusable workflow coverage gap](https://github.com/github/gh-actions-lock/issues/179)
 - [NIST: Design Tenets for Agent Identity Management Systems (27 Oct 2026)](https://www.nist.gov/blogs/cybersecurity-insights/design-tenets-agent-identity-management-systems)
 - [Australian Signals Directorate: Agentic AI harnesses (11 Sep 2026)](https://www.cyber.gov.au/advisory/agentic-ai-harnesses)
+
+## Revalidation note — documentation head and workflow inventory (29 October 2026)
+
+This note was added after the initial report snapshot. The QZ Intelligence documentation branch advanced to commit `0a6251f6ec3f3f394019b5a088722decd103aede` when the workflow supply-chain acceptance gate was documented in `IMPLEMENTATION_PLAN_AND_ACCEPTANCE.md`.
+
+**Exact-head check:** the GitHub Actions workflow-run query returned no runs for this documentation commit, and the combined commit-status query returned no statuses. Therefore, CI for this exact head is **NOT VERIFIED**. Do not infer success from the historical PR #4 workflow runs or from the report's 51-attempt dataset. The PR remains open and draft; the review query returned no independent review submissions.
+
+### Read-only workflow reference checks
+
+| Ref inspected | Workflow | Direct action references | Observed control |
+|---|---|---|---|
+| `project-q/controlled-foundation` | `.github/workflows/project-q-checks.yml` | `actions/checkout` and `actions/setup-python` pinned to full commit SHAs | `contents: read`; checkout uses `persist-credentials: false`; cancellation enabled |
+| `project-q/security-hardening-q-sec-02` | `.github/workflows/project-q-checks.yml` | Same two actions pinned to full commit SHAs | `contents: read`; checkout uses `persist-credentials: false`; cancellation enabled |
+| `feature/qz-assd-foundation` | `.github/workflows/qz-validation.yml` | `actions/checkout@v7`; `actions/setup-node@v7` | `contents: read`; two Ubuntu matrix environments; five-minute timeout; cancellation enabled |
+
+The two Project Q workflow files were read directly from the listed refs. The QZ/ASSD workflow was read directly from `feature/qz-assd-foundation`. This is a **partial, ref-specific inventory**, not proof that every branch, reusable workflow, local action, container image, or dependency has been inventoried. The tag-pinned QZ/ASSD action references remain a hardening candidate. No lockfile generation or enforcement is claimed.
+
+### Required next evidence
+
+- Enumerate workflow files and dependency types for each in-scope branch and the intended release base.
+- Inspect every `uses:` reference, including reusable workflows, local actions and container images; record full-SHA pins where applicable.
+- Generate and review any Actions lockfile using the official tool only after inventory and dependency review.
+- Verify lockfile coverage and negative tests in CI; retain exact commit, run ID, logs and independent review decision.
+- Recheck CI on the latest documentation head; keep the result UNKNOWN until a run/status is actually returned.
+
+This note changes reporting only. It does not change the release gate: **independent review, trusted authorization, staging acceptance, recovery/rollback and formal release approval remain open; production remains HOLD.**
+
