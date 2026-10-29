@@ -49,6 +49,20 @@ Learning and next cycle
 - KPI_AND_PERFORMANCE_REPORTING.md — KPI definitions and progress/time graph rules.
 - IMPLEMENTATION_PLAN_AND_ACCEPTANCE.md — staged plan, tests and release gates.
 
+## Inventory-count reconciliation — OPEN
+
+The numbers currently used across the QZ/QQQ materials describe different and not-yet-reconciled inventory concepts:
+
+| Label | Current interpretation | Authority |
+|---|---|---|
+| 24 factor entries | Proposed domain catalogue in `FACTOR_REGISTRY.md`; not proof of 24 active services or approved projects | PR #9 proposal only |
+| “12-domain” | Historical label referenced in the master-control discussion; authoritative list and mapping not yet verified here | OPEN |
+| “eight-project network” | Historical architecture label; membership and relationship to the 12-domain list are not yet verified here | OPEN |
+
+**Control rule:** do not add, remove, rename, merge or report a canonical project count until the owner-approved source-of-truth inventory is retrieved and reconciled. Build a mapping of canonical ID, display name, parent/subproject relationship, lifecycle state (proposed/active/retired), accountable owner, repository path and evidence link. Distinguish *domains*, *project families*, *subprojects* and *running services*; they are not interchangeable counts.
+
+**Exit criteria:** the accountable owner confirms the source-of-truth list; all historical labels are mapped or explicitly retired; duplicate/alias IDs are recorded; an independent reviewer verifies the mapping; the master register and this proposal link to the same versioned inventory. Until then, inventory reconciliation remains **OPEN / BLOCKING CANONICAL ADOPTION**.
+
 ## Reuse existing QZ components
 Complement PR #8 (QZ Autopilot Master Control Register), PR #4 (QZ/ASSD validation), and PR #5/#7 (QQQ/StudyCore/Mega-Engine). Reconcile existing IDs and the 12-domain/eight-project wording before declaring a canonical inventory. Do not duplicate or silently rename existing subprojects.
 
