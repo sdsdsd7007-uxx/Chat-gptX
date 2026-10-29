@@ -48,3 +48,45 @@ Each study must include a study ID, UTC study time, one or more source reference
 - Production requires independent code review, an approved policy catalogue, real source adapters, permissions/secret review, integration and staging tests, telemetry, deduplication/quarantine, recovery and rollback drills, and signed release approval.
 
 **Release status: HOLD / NOT APPROVED FOR PRODUCTION.**
+
+
+## Security review — trust boundary (2026-10-29)
+
+### What the current code proves
+
+- The proposal fingerprint detects accidental or unapproved changes to the material proposal fields **when the recorded fingerprint is retained as trusted data**.
+- The apply function checks that the approval names the proposal and the same fingerprint, that the configuration version and base value are current, and that the reviewer ID differs from `requestedBy`.
+- These are integrity and consistency checks inside a function; they are not identity authentication.
+
+### Critical limitation: approval records are caller-supplied
+
+`applyApprovedEngineUpdate(config, proposal, approval)` receives the approval object as an ordinary JavaScript object. The module does not authenticate who created it, verify a digital signature, consult a trusted identity provider, or independently establish that the reviewer is authorized. A caller able to construct the object can supply a distinct `reviewerId`, an `approved` status, a timestamp, an evidence-reference string, and a matching fingerprint. Therefore the current module must **not** be treated as a security boundary or as proof of human approval.
+
+Likewise, `sourceReferences` and the subengine status/confidence fields are inputs to the module. The module checks consistency and required fields; it does not prove that referenced evidence exists, is authentic, or supports the supplied claim. A SHA-256 proposal fingerprint is not a signature and does not authenticate the reviewer.
+
+### Required design before any real configuration write
+
+1. Put approval verification in a trusted server-side boundary that ordinary callers cannot replace or bypass.
+2. Authenticate the reviewer using the organization’s identity provider; authorize role, scope, separation of duties, and approval expiry.
+3. Verify a signed approval envelope or a durable approval record from a trusted service. Bind it to the proposal fingerprint, base config version, repository/environment, expiry, and a unique approval ID.
+4. Enforce single use / replay protection and write an append-only audit event. Do not trust a caller-supplied reviewer ID or evidence URL as proof by itself.
+5. Resolve evidence references through approved adapters and record provenance, retrieval time, content digest, and validation outcome. Keep secrets and unnecessary personal data out of logs.
+6. Apply updates only through a server-side allowlisted operation with optimistic concurrency, independent post-change verification, and a tested rollback path.
+7. Add negative tests for forged approvals, expired/replayed approvals, unauthorized roles, evidence substitution, stale config, and attempted approval-service bypass. Run these in staging with a documented test record.
+
+### Workflow supply-chain finding
+
+The current validation workflow references `actions/checkout@v7` and `actions/setup-node@v7` by version tags. Tags are mutable references. GitHub announced workflow dependency lockfiles as generally available on 2026-10-28; the recommended next step is to install and run the official `gh actions-lock` extension in a controlled development environment, review the generated dependency commits and full diff, then commit the generated lockfile. Do **not** hand-write lockfile hashes or enforce the policy before all relevant workflows have been onboarded and verified.
+
+A lockfile improves reproducibility; it does not prove that an action is safe. Continue source review and use Dependabot or another reviewed update process.
+
+### Review disposition
+
+- Proposal tamper-detection regression tests: present; latest CI passed on the current feature-branch head.
+- Trusted reviewer authentication / signed approval: **NOT IMPLEMENTED**.
+- Evidence authenticity and provenance verification: **NOT IMPLEMENTED**.
+- Workflow dependency lockfile: **NOT IMPLEMENTED**.
+- Staging acceptance tests QZ-AT-001–023: **NOT RUN**.
+- Production release: **HOLD / NOT APPROVED**.
+
+This review is a code-level assessment, not an independent security audit or a claim that the repository has been penetrated.
