@@ -321,7 +321,8 @@ xychart-beta
 | #4 / run #125, Ubuntu 26.04 | `8aa8c07e4f2628b3b19fc52556b8a9a86e7603d2` | 39/39 | Matrix job passed |
 | #5 / run #91 | `6ff8a503875ec100932f684cd925837accacf992` | 22/22 | Test suite passed on that commit |
 | #7 / run #112 | `92edeac6f416ca28f8f1dac964cf24036d74cbe4` | 56/56 | Test suite passed on that commit |
-| #8 | `881b5f8ed11aa1ca4027f7066264d0b49f88d4d8` | UNKNOWN | No Actions/check run verified |
+| #8 | `4e07e4ef7bbd57ff068216c50c5604ae670e5dea` | UNKNOWN | Current documentation head; no associated Actions run or combined status returned at recheck |
+| #9 | `127c5ce675128d6bebad3a5e58227c3148a15180` | UNKNOWN | New factor/country/relationship/KPI documentation PR; no associated Actions run returned; independent review not recorded |
 
 ### 12.2 Release-gate progress
 
@@ -340,7 +341,7 @@ flowchart TD
 
 ### 12.3 Progress over time: data limitation
 
-A valid progress-over-time line chart requires dated repeated observations for the same measure (for example, open release blockers by day, acceptance tests completed per dated run, or median test duration per workflow). The current register provides a point-in-time snapshot and selected historical run references, but not a complete, consistently measured time series. Therefore **no trend line or time-to-completion estimate is fabricated here**.
+A valid progress-over-time line chart requires dated repeated observations for the same measure (for example, open release blockers by day, acceptance tests completed per dated run, or median test duration per workflow). The current register provides a point-in-time snapshot and selected historical run references, but not a complete, consistently measured time series. PR #9 now proposes factor/country/relationship subprojects and KPI reporting rules; its current head has no associated Actions run in the recheck, so it contributes no verified test or runtime-performance datapoint. Therefore **no trend line or time-to-completion estimate is fabricated here**.
 
 For the next reporting cycle, record per run: UTC timestamp, exact commit SHA, workflow/run ID, suite and environment, tests passed/failed/skipped, duration from actual job metadata, open blockers by stable ID, acceptance tests executed, and evidence links. Use these to produce separate charts for (1) test duration versus date, (2) acceptance completion versus date, and (3) blocker count versus date. Do not combine different test suites into a single quality score or interpret passing-test counts as product performance.
 
