@@ -58,6 +58,7 @@ The initial domain/relationship/country design has been extended with a governed
 - [Integration, strategic stakeholder and adoption strategy](PARTNERSHIP_AND_ADOPTION_STRATEGY.md)
 - [Experiment backlog, 90-day sequence and graph contracts](EXPERIMENT_BACKLOG_AND_ROADMAP.md)
 - [Technology and standards horizon scan — 2026-10-29](TECHNOLOGY_AND_STANDARDS_HORIZON_SCAN.md)
+- [Agentic workflow version/advisory review — 2026-10-29](AGENTIC_WORKFLOW_VERSION_REVIEW_2026-10-29.md)
 - [QZ/ASSD performance and progress report with graphs](reports/QZ_ASSD_Performance_Progress_Report_2026-10-29.md)
 - [CI duration trend (SVG)](reports/CI_DURATION_TREND.svg)
 - [CI outcome distribution (SVG)](reports/CI_OUTCOME_DISTRIBUTION.svg)
