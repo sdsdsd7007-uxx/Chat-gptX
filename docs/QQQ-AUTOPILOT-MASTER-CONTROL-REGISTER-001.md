@@ -154,6 +154,33 @@ The measures below are **proposed**, not live measurements. Assign owners, sourc
 
 For all KPIs: record denominator and sample size, time window, excluded records, owner, source timestamp, last calculation, baseline and confidence/limitations. Avoid aggregate “green” states that conceal a failing critical control.
 
+### Current Market X signal snapshot — 29 October 2026
+
+**Source timestamp:** Uganda Ministry of Finance, Planning and Economic Development (MoFPED), *Performance of the Economy Report — September 2026*, published 27 October 2026. These are **dated September/October observations**, not live prices or forecasts.
+
+| Signal | Official observation | Strategy interpretation for QZ / Market X |
+|---|---|---|
+| Headline inflation | 4.6% in September vs 4.1% in August | Re-check purchase-price assumptions, especially food, transport and imported inputs. |
+| Core inflation | 3.7% vs 3.5% | Monitor generalized input-cost pressures, not only fuel. |
+| Energy, Fuel & Utilities inflation | 14.5% vs 14.3% | Energy/freight assumptions deserve explicit sensitivity tests. |
+| Purchasing Managers’ Index | 53.0 vs 55.0; still above the 50 expansion threshold | Business conditions remained expansionary, but their pace moderated as input costs rose. |
+| Average UGX/USD midrate | UGX 3,868.87/USD in September vs UGX 3,730.25/USD in August; MoFPED reports 3.7% depreciation | Imported-item landed costs may be FX-sensitive; use the current authorized finance/treasury quote for an actual purchase, not this historic monthly average. |
+| Central Bank Rate | Raised from 9.75% to 12.0% at the 14 October 2026 special MPC meeting | Financing/carrying-cost assumptions should be checked against actual contract terms and current bank offers. |
+
+**Source:** https://mepd.finance.go.ug/documents/POE/2026/POE-2026-09-SEP.html
+
+#### Procurement / Odoo decision rule (proposed; not live-system logic)
+
+Use a coverage-period approach rather than reorder quantity based only on a point estimate:
+
+`Recommended order quantity = max(0, forecast demand over protection period + approved safety stock − usable available stock − confirmed incoming stock)`
+
+Where protection period = supplier lead time + review interval. Determine safety stock from observed demand/lead-time variability and the approved service level, with explicit units and ownership. Do not insert an arbitrary safety-stock percentage or fabricate demand values.
+
+For critical imported inputs, compare current supplier quotes with the approved budget FX rate, quoted validity period, shipping/insurance, taxes and lead time. Run at least base / adverse / severe **sensitivity scenarios** using documented, owner-approved shocks; do not label scenarios as predictions. Trigger quote refresh, escalation or alternate-supplier review only at thresholds approved by the responsible procurement/finance owner. Do not automatically create or modify a purchase order from this dashboard.
+
+**Immediate Market X priority:** revalidate the inputs and sensitivity assumptions before approving the next material import-linked purchase. Track actual-versus-forecast landed cost, supplier on-time-in-full, lead-time variability, stock-out incidents, days of cover, and confirmed incoming inventory. Until source systems and owners are connected, these KPIs remain **UNKNOWN / NOT CONNECTED**, not zero.
+
 ## 7. Bounded AUTOPILOT runbook
 
 ### Run state machine
