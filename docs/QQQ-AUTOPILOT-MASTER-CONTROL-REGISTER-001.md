@@ -66,7 +66,7 @@ Inspection date: 2026-10-29. Recheck these facts before any merge because branch
 - PR #7 is a **stacked change over PR #5**. Merging it to its current base incorporates its changes into PR #5's feature branch, not directly into `main`.
 - A comparison of the PR #4 head with the PR #5 head returned **diverged** (33 commits ahead and 16 behind from the specified comparison). Their changes overlap in telemetry/schema/validation areas.
 - These are two stacks (#1→#2 and #5→#7), plus independent PR #4 and documentation-only PR #8. They do not form one safe linear chain. Create a temporary integration branch from the agreed base, integrate overlapping telemetry/schema changes deliberately, run the full combined test suite, inspect the complete diff, then choose a release sequence. Do not rewrite branch bases or merge the PRs blindly.
-- Repository Issue #3 records branch protection/rulesets and independent review as unresolved at its last update. The available GitHub connection can read some repository metadata but cannot administer those controls; an authorized repository owner must apply and verify them.
+- Repository Issue #3 records branch protection/rulesets and independent review as unresolved at its last update. A fresh branch-protection API read in this inspection returned HTTP 403, so the current protection state is **UNVERIFIED** from this connection—not newly confirmed either enabled or disabled. An authorized repository owner must inspect, apply and verify the controls.
 - PR #8 creates documentation only. It is intentionally not a merge of the implementation changes from PR #1, #2, #4, #5 or #7.
 
 ## 4. New research findings that change the design
@@ -91,14 +91,26 @@ https://genai.owasp.org/resource/agent-control-standard-acs/
 
 **Implementation consequence:** put authorization, data-scope enforcement, tool-call validation, limits, cancellation and audit at the tool/harness boundary. Prompt instructions and model self-reports are not enforcement controls. The offline contract tests do not prove runtime enforcement until connected components and tests exist.
 
-### 4.3 Post-quantum cryptography: inventory and migration, not a made-up “level”
+### 4.3 Workflow dependency locking and CI/CD supply-chain risk
+
+GitHub announced general availability of Actions workflow dependency lockfiles on 28 October 2026. The official `gh actions-lock` tool can generate a reviewable `.github/workflows/actions.lock` for workflow dependencies and transitive dependencies; reusable workflow references also need explicit treatment, and each called workflow should be reviewed for its own dependency-locking coverage. Lockfiles reduce unexpected dependency drift, but they do not prove that a dependency is safe.
+
+Source: GitHub Changelog, *GitHub Actions workflow lockfiles are generally available* (28 October 2026): https://github.blog/changelog/2026-10-28-github-actions-workflow-lockfiles-are-generally-available/
+
+Microsoft Security Research reported a July 2026 AsyncAPI npm supply-chain compromise in which a privileged `pull_request_target` workflow consumed untrusted pull-request code; compromised packages later executed at module-import time. This is a **general threat-model example, not evidence that this repository or its dependencies were compromised**.
+
+Source: Microsoft Security Blog, *Unpacking the AsyncAPI npm supply chain compromise and import-time payload delivery* (15 July 2026): https://www.microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery/
+
+**Implementation consequence for QZ:** inventory every workflow and reusable workflow; review triggers and whether any privileged context consumes untrusted PR content; minimize token permissions and persisted checkout credentials; scrutinize secrets and OIDC publishing trust; lock dependencies with official tooling and review diffs; add a non-mutating lock freshness check. Do not hand-author lock hashes. Do not run suspicious dependencies or payloads as a research shortcut. No dependency audit or incident-response conclusion is claimed until the actual dependency inventory, manifests, workflows and current commit are examined.
+
+### 4.4 Post-quantum cryptography: inventory and migration, not a made-up “level”
 
 NIST finalized *IR 8547 — Transition to Post-Quantum Cryptography Standards* on 27 October 2026. It describes an organized transition away from quantum-vulnerable cryptographic algorithms toward quantum-resistant standards:
 https://csrc.nist.gov/pubs/ir/8547/final
 
 **Implementation consequence:** create a cryptographic inventory, classify data by sensitivity and retention horizon, record algorithms/protocols/certificates and dependencies, define crypto-agility and migration ownership, and test interoperability and recovery. Evaluate NIST standards such as ML-KEM, ML-DSA and SLH-DSA for relevant use cases using official standards and expert review. Do not claim “PQC Level 5/10,” certification, or quantum security without a recognized scope and independent evidence.
 
-### 4.4 Uganda supply-chain and procurement resilience
+### 4.5 Uganda supply-chain and procurement resilience
 
 The Uganda Ministry of Finance's September 2026 economy report records headline inflation of 4.6% versus 4.1% in August, energy/fuel/utilities inflation of 14.5%, an average September rate of UGX 3,868.87/USD versus UGX 3,730.25/USD in August, and the Bank of Uganda raising its central bank rate to 12.0% in October:
 https://mepd.finance.go.ug/documents/POE/2026/POE-2026-09-SEP.html
@@ -175,7 +187,7 @@ Each real run needs an immutable run ID, user intent, exact task scope, version/
 | **P1** | Complete threat-to-test mapping | Applicable QSEC rows converted to synthetic regression tests; not-applicable rows clearly recorded | No compliance claim from a plan alone |
 | **P1** | Resolve 12-versus-8 project count | Define whether the counts mean domains, projects or workstreams; one canonical registry and automated consistency check | No conflicting “fully synchronized” claims |
 | **P1** | Verify dashboard behavior | Deterministic headless click-through, keyboard/navigation check, empty/error states, stale/live labels and export validation | Do not rely on a timed-out visual test |
-| **P1** | Close workflow dependency-locking gap | Use the official documented lockfile process; inspect generated hashes and update strategy; CI verifies pins | Do not hand-author integrity hashes |
+| **P1** | Close workflow dependency-locking gap | Inventory every workflow/reusable workflow; use official `gh actions-lock` tooling and review generated dependencies; add a non-mutating freshness check; separately review privileged triggers, token scope, persisted credentials, secrets and publishing trust | Do not hand-author hashes or infer dependencies are safe because they are locked |
 | **P1** | Establish evidence/KPI register | Source, owner, units, formula, timestamp, freshness SLA and status for each initial KPI | No fake live values |
 | **P2** | StudyCore bibliography reconciliation | Verified title/author/edition/contents/page references; explicit gaps and rights notes | Do not describe incomplete study as completed |
 | **P2** | Controlled AI-provider comparison | Common task set, dated model/provider versions, repeat counts, quality/cost/latency/privacy limits and failure analysis | No provider selected from anecdotes alone |
@@ -215,3 +227,5 @@ This runbook does not perform steps 2–8 by itself. Actual changes and releases
 4. OWASP GenAI Security Project — *Agent Control Standard (ACS)*, 1 September 2026: https://genai.owasp.org/resource/agent-control-standard-acs/
 5. NIST — *IR 8547: Transition to Post-Quantum Cryptography Standards*, final 27 October 2026: https://csrc.nist.gov/pubs/ir/8547/final
 6. Uganda Ministry of Finance, Planning and Economic Development — *Performance of the Economy Report, September 2026*: https://mepd.finance.go.ug/documents/POE/2026/POE-2026-09-SEP.html
+7. GitHub Changelog — *GitHub Actions workflow lockfiles are generally available*, 28 October 2026: https://github.blog/changelog/2026-10-28-github-actions-workflow-lockfiles-are-generally-available/
+8. Microsoft Security Blog — *Unpacking the AsyncAPI npm supply chain compromise and import-time payload delivery*, 15 July 2026: https://www.microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery/
