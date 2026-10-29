@@ -120,6 +120,27 @@ export function validateRecommendationSet(input) {
           errors.push(prefix + ' owner_role and reviewer_role must be distinct roles');
         }
       });
+      const seenRecommendationIds = new Set();
+      input.recommendations.forEach((option, index) => {
+        if (!isRecord(option) || !nonEmptyString(option.recommendation_id)) return;
+        const id = option.recommendation_id.trim();
+        if (seenRecommendationIds.has(id)) {
+          errors.push('recommendations[' + index + '] duplicate recommendation_id: ' + id);
+        } else {
+          seenRecommendationIds.add(id);
+        }
+        if (Array.isArray(option.linked_finding_ids) && option.linked_finding_ids.every(nonEmptyString)) {
+          const seenFindingIds = new Set();
+          option.linked_finding_ids.forEach((findingId, findingIndex) => {
+            const normalizedId = findingId.trim();
+            if (seenFindingIds.has(normalizedId)) {
+              errors.push('recommendations[' + index + '] duplicate linked_finding_ids entry at index ' + findingIndex);
+            } else {
+              seenFindingIds.add(normalizedId);
+            }
+          });
+        }
+      });
     }
   }
 
