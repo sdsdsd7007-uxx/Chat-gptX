@@ -15,6 +15,8 @@
 **Decision: consolidate the design and evidence register now; keep production HOLD.**
 
 The repository already contains several useful strands:
+- Project Q evidence records, fail-closed release policy, Project Z synthetic telemetry/retrieval pilot and benchmark protocol (PR #1);
+- Project Q provenance/approval lifecycle, local replay-ledger prototype and inventory/recovery hardening (PR #2);
 - QZ/ASSD telemetry validation and evidence-gated change proposals (PR #4);
 - QQQ v53.2 inventory, StudyCore, next-cycle intelligence/recommendation contracts, and validation hardening (PR #5);
 - QQQ v100 engineering vision, DIIP and recommendation contracts, security threat-to-test matrix, and synthetic supply-chain cost model (PR #7).
@@ -60,10 +62,12 @@ Inspection date: 2026-10-29. Recheck these facts before any merge because branch
 
 ### Branch topology finding
 
+- PR #2 is a **stacked change over PR #1**. Comparing PR #1 head `a65228ff3d1d06c9cd8341e23858649335449039` with PR #2 head `2c1068f2c94ef8edb5d72f6eb238a5aa6ff385a7` returned **ahead by 72, behind by 0**. Preserve the #1 → #2 sequence, while treating PR #2's replay-ledger trust-boundary issue as an independent blocker.
 - PR #7 is a **stacked change over PR #5**. Merging it to its current base incorporates its changes into PR #5's feature branch, not directly into `main`.
-- A comparison of the PR #4 head with the PR #5 head returned **diverged** (33 commits ahead and 16 behind from the specified comparison). Their changes overlap in telemetry schema/validation areas.
-- Therefore, do not merge the three PRs independently in arbitrary order and do not rewrite their bases blindly. Create a temporary integration branch from the agreed base, integrate the telemetry/schema changes once, run the full combined test suite, review the resulting diff, and only then propose a release sequence.
-- The present PR creates documentation only. It is intentionally not a merge of PR #4, #5 or #7.
+- A comparison of the PR #4 head with the PR #5 head returned **diverged** (33 commits ahead and 16 behind from the specified comparison). Their changes overlap in telemetry/schema/validation areas.
+- These are two stacks (#1→#2 and #5→#7), plus independent PR #4 and documentation-only PR #8. They do not form one safe linear chain. Create a temporary integration branch from the agreed base, integrate overlapping telemetry/schema changes deliberately, run the full combined test suite, inspect the complete diff, then choose a release sequence. Do not rewrite branch bases or merge the PRs blindly.
+- Repository Issue #3 records branch protection/rulesets and independent review as unresolved at its last update. The available GitHub connection can read some repository metadata but cannot administer those controls; an authorized repository owner must apply and verify them.
+- PR #8 creates documentation only. It is intentionally not a merge of the implementation changes from PR #1, #2, #4, #5 or #7.
 
 ## 4. New research findings that change the design
 
