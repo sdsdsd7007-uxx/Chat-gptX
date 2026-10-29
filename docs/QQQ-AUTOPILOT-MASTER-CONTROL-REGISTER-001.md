@@ -297,3 +297,59 @@ This runbook does not perform steps 2–8 by itself. Actual changes and releases
 9. Official GitHub CLI extension — `github/gh-actions-lock` (public preview / pre-1.0): https://github.com/github/gh-actions-lock
 10. `github/gh-actions-lock` issue #179 — remote reusable workflow references omitted from lock coverage; opened 16 October 2026: https://github.com/github/gh-actions-lock/issues/179
 11. Microsoft Security Blog — *Disrupting supply chain attacks on npm and GitHub Actions*, 28 July 2026: https://github.blog/security/supply-chain-security/disrupting-supply-chain-attacks-on-npm-and-github-actions/
+
+
+## 12. Performance, progress and time graphs
+
+**Evidence date:** 2026-10-29. These charts summarize the latest recorded test counts supplied by the repository's PR/Actions records. They are not runtime performance benchmarks, throughput measurements, production telemetry, or elapsed-time measurements. PR #8 has no CI run; its test count is unknown, not zero. Test counts are not directly comparable as quality scores because suites cover different scopes.
+
+### 12.1 Recorded test volume by implementation PR
+
+```mermaid
+xychart-beta
+    title "Recorded passing tests by PR (29 Oct 2026 snapshot)"
+    x-axis ["PR1", "PR2", "PR4-Ubuntu24", "PR4-Ubuntu26", "PR5", "PR7"]
+    y-axis "Passed tests" 0 --> 90
+    bar [42, 85, 39, 39, 22, 56]
+```
+
+| PR / run | Exact head at last verification | Recorded result | Evidence meaning |
+|---|---|---:|---|
+| #1 / run #35 | `a65228ff3d1d06c9cd8341e23858649335449039` | 42/42 | Test suite passed on that commit |
+| #2 / run #162 | `2c1068f2c94ef8edb5d72f6eb238a5aa6ff385a7` | 85/85 | Test suite passed on that commit |
+| #4 / run #125, Ubuntu 24.04 | `8aa8c07e4f2628b3b19fc52556b8a9a86e7603d2` | 39/39 | Matrix job passed |
+| #4 / run #125, Ubuntu 26.04 | `8aa8c07e4f2628b3b19fc52556b8a9a86e7603d2` | 39/39 | Matrix job passed |
+| #5 / run #91 | `6ff8a503875ec100932f684cd925837accacf992` | 22/22 | Test suite passed on that commit |
+| #7 / run #112 | `92edeac6f416ca28f8f1dac964cf24036d74cbe4` | 56/56 | Test suite passed on that commit |
+| #8 | `881b5f8ed11aa1ca4027f7066264d0b49f88d4d8` | UNKNOWN | No Actions/check run verified |
+
+### 12.2 Release-gate progress
+
+```mermaid
+flowchart TD
+    A[Design and contracts: IN PROGRESS] --> B[Exact-head CI: PASS for PRs 1, 2, 4, 5, 7]
+    B --> C[Independent review: NOT RECORDED]
+    C --> D[Trusted identity and authorization: OPEN]
+    D --> E[Approved staging adapters: NOT VERIFIED]
+    E --> F[QZ-AT-001–023: NOT RUN]
+    F --> G[Recovery and rollback proof: NOT EVIDENCED]
+    G --> H[Formal release approval: NOT RECORDED]
+    H --> I[Production: HOLD]
+    style I fill:#fdd,stroke:#900
+```
+
+### 12.3 Progress over time: data limitation
+
+A valid progress-over-time line chart requires dated repeated observations for the same measure (for example, open release blockers by day, acceptance tests completed per dated run, or median test duration per workflow). The current register provides a point-in-time snapshot and selected historical run references, but not a complete, consistently measured time series. Therefore **no trend line or time-to-completion estimate is fabricated here**.
+
+For the next reporting cycle, record per run: UTC timestamp, exact commit SHA, workflow/run ID, suite and environment, tests passed/failed/skipped, duration from actual job metadata, open blockers by stable ID, acceptance tests executed, and evidence links. Use these to produce separate charts for (1) test duration versus date, (2) acceptance completion versus date, and (3) blocker count versus date. Do not combine different test suites into a single quality score or interpret passing-test counts as product performance.
+
+### 12.4 KPI definitions and graph rules
+
+- **CI pass rate** = passed tests / (passed + failed tests); report skipped tests separately and show the suite and commit. Do not calculate when counts are unavailable.
+- **Acceptance progress** = completed acceptance cases / total applicable cases; current QZ-AT-001–023 remains 0 completed only if the register confirms all are NOT RUN. “Not run” is not a failed test.
+- **Blocker trend** = count of unique open blockers at each dated snapshot, preserving blocker IDs and status history.
+- **Elapsed duration** = actual workflow/job duration from Actions metadata, not wall-clock guesses or the five-minute configured timeout.
+- **Outcome impact** = only measured against an approved baseline with source, units, observation window and attribution method; currently UNKNOWN where no verified telemetry exists.
+
+**Subproject destinations:** maintain this chart methodology in this canonical register; implementation test details remain with their owning PR/subproject; source and freshness records belong in StudyCore/DIIP evidence records; Market X may visualize approved KPI data only after adapters and provenance are verified. This documentation does not create those integrations or claim automatic scheduled execution.
