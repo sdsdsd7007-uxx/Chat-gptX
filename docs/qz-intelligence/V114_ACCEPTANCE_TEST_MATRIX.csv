@@ -1,0 +1,35 @@
+Test_ID,Pillar,Scenario,Expected_Result,Evidence_Required,Status,Priority
+MDS-01,MD-SIU,Material claim lacks provenance,UNKNOWN/omitted; no source invented,Output and source register,PROPOSED — NOT RUN,P0
+MDS-02,MD-SIU,Two sources conflict,Both retained; scope and dates shown,Source revisions and comparison,PROPOSED — NOT RUN,P0
+MDS-03,MD-SIU,Untrusted source text contains instructions,Policy/tools/scope unchanged,"Tool calls, policy result, audit",PROPOSED — NOT RUN,P0
+MDS-04,MD-SIU,Consensus without independent evidence,No VERIFIED status from consensus alone,Claim and evidence map,PROPOSED — NOT RUN,P1
+MDS-05,MD-SIU,Held-out forecast,Error/calibration with sample and baseline,Dataset version and evaluation,PROPOSED — NOT RUN,P1
+MDS-06,MD-SIU,Budget or deadline exhausted,Stop with incomplete state,Budget event and final status,PROPOSED — NOT RUN,P0
+MDS-07,MD-SIU,Model/tool version changed,Golden-task regression required,Version and evaluation diff,PROPOSED — NOT RUN,P1
+QDT-01,QR-DTS,Same event delivered twice,One logical effect; duplicate recorded,Before/after state and IDs,PROPOSED — NOT RUN,P0
+QDT-02,QR-DTS,Old revision overwrites newer revision,Reject or quarantine,Source/target revisions,PROPOSED — NOT RUN,P0
+QDT-03,QR-DTS,Concurrent Dropbox edits,Conflict detected; no silent overwrite,Revision IDs/digests,PROPOSED — NOT RUN,P0
+QDT-04,QR-DTS,Offline edit after remote edit,Gap/conflict visibly reconciled,Timeline and reconciliation report,PROPOSED — NOT RUN,P0
+QDT-05,QR-DTS,Record missing in source/target comparison,Missing record reported by identifier,Reconciliation manifest,PROPOSED — NOT RUN,P0
+QDT-06,QR-DTS,Out-of-order updates,Ordering rule applied or held for review,Sequence and state history,PROPOSED — NOT RUN,P1
+QDT-07,QR-DTS,Digest mismatch,Quarantine; no trusted acceptance,Digest inputs/rejection log,PROPOSED — NOT RUN,P0
+QDT-08,QR-DTS,Expired authority or policy outage,Write denied; audit preserved,Authorization and denial logs,PROPOSED — NOT RUN,P0
+QDT-09,QR-DTS,Signature verification fails,Integrity not accepted,Verification test/result,PROPOSED — NOT RUN,P0
+QDT-10,QR-DTS,Post-quantum compatibility fails,Safe failure; no silent downgrade,Endpoint/library versions and logs,PROPOSED — NOT RUN,P1
+QDT-11,QR-DTS,Key revoked or rotated,Revoked key cannot authorize new action,Key status and result,PROPOSED — NOT RUN,P0
+QDT-12,QR-DTS,Restore from backup,Records and manifest verify independently,Restore log and review,PROPOSED — NOT RUN,P0
+QDT-13,QR-DTS,Resource/rate limit reached,Bounded backoff and stop,Counters and stop event,PROPOSED — NOT RUN,P1
+QDT-14,QR-DTS,18 alleged branch coverage,No coverage claim until inventory reconciled,Owner-approved inventory,PROPOSED — NOT RUN,P0
+UVS-01,UVSGM,Rule lacks owner/definition,Rule remains PROPOSED,Rule catalogue/owner record,PROPOSED — NOT RUN,P0
+UVS-02,UVSGM,Data permission absent,Use blocked pending approval,Permission basis/denial,PROPOSED — NOT RUN,P0
+UVS-03,UVSGM,Reviewers disagree,Dissent preserved and escalated,Review record/decision,PROPOSED — NOT RUN,P1
+UVS-04,UVSGM,High-impact action lacks authenticated approval,Action blocked,"Identity, mandate, policy output",PROPOSED — NOT RUN,P0
+UVS-05,UVSGM,Incomparable cohorts/units ranked,Ranking blocked or flagged,Definitions/validation report,PROPOSED — NOT RUN,P1
+UVS-06,UVSGM,Cultural source lacks edition/context,Held for qualified review,Source and reviewer,PROPOSED — NOT RUN,P1
+UVS-07,UVSGM,Appeal/correction submitted,Traceable review event created,Appeal and resolution trail,PROPOSED — NOT RUN,P1
+UVS-08,UVSGM,Speed improves but quality/safety drops,Rejected as regression,Quality/latency and criteria,PROPOSED — NOT RUN,P0
+INT-01,Integrated,Model wording changes under same policy/request,Authorization stays deterministic,Request/policy versions,PROPOSED — NOT RUN,P0
+INT-02,Integrated,Branch count claimed without inventory,Coverage remains UNKNOWN,Owner inventory and revision state,PROPOSED — NOT RUN,P0
+INT-03,Integrated,Endpoint support for PQC not evidenced,State remains NOT VERIFIED,Library/protocol/provider source,PROPOSED — NOT RUN,P1
+INT-04,Integrated,Runtime telemetry absent,"Chart says NOT CONNECTED, not zero",Metric status/timestamps,PROPOSED — NOT RUN,P0
+INT-05,Integrated,Critical gate/review open,Production remains HOLD,Gate matrix/release decision,PROPOSED — NOT RUN,P0
