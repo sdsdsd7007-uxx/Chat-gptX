@@ -181,3 +181,46 @@ test('not-applicable subengine with registered evidence and rationale remains ex
   assert.equal(cere.decision, 'CONTINUE');
   assert.equal(result.updateProposal.status, 'PENDING_APPROVAL');
 });
+
+
+test('post-approval changes to any material proposal field are rejected', () => {
+  const mutations = [
+    (proposal) => { proposal.proposedValue = 0.92; },
+    (proposal) => { proposal.rationale = 'Changed after review'; },
+    (proposal) => { proposal.expectedOutcome = 'Different outcome after review'; },
+    (proposal) => { proposal.evidenceReferences = ['evidence:substituted']; },
+    (proposal) => { proposal.baseValue = 0.86; },
+    (proposal) => { proposal.issues = ['review bypass attempt']; }
+  ];
+
+  for (const mutate of mutations) {
+    const base = config();
+    const result = runStudyCycle(study(), base);
+    const proposal = structuredClone(result.updateProposal);
+    const approval = {
+      status:'approved', proposalId:proposal.proposalId, reviewerId:'reviewer-2',
+      proposalFingerprint:proposal.fingerprint, evidenceReference:'approval:123',
+      approvedAtUtc:'2026-10-28T10:00:00Z', baseConfigVersion:1
+    };
+    const before = structuredClone(base);
+    mutate(proposal);
+    assert.throws(
+      () => applyApprovedEngineUpdate(base, proposal, approval),
+      /proposal contents changed since its fingerprint was recorded/
+    );
+    assert.deepEqual(base, before);
+  }
+});
+
+test('approval must carry the exact fingerprint that was reviewed', () => {
+  const base = config();
+  const result = runStudyCycle(study(), base);
+  const proposal = result.updateProposal;
+  const before = structuredClone(base);
+  assert.throws(() => applyApprovedEngineUpdate(base, proposal, {
+    status:'approved', proposalId:proposal.proposalId, reviewerId:'reviewer-2',
+    proposalFingerprint:'0'.repeat(64), evidenceReference:'approval:123',
+    approvedAtUtc:'2026-10-28T10:00:00Z', baseConfigVersion:1
+  }), /approval fingerprint does not match the proposal/);
+  assert.deepEqual(base, before);
+});
