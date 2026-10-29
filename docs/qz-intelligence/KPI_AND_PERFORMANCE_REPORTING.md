@@ -61,7 +61,7 @@ The v114.0 concept adds three design areas: MD-SIU (evidence-backed analysis and
 
 The connected Dropbox v121.0 assurance pack remains the existing baseline; this v114.0 track must not replace it. Its proposed tests remain NOT RUN and production remains HOLD. Zero latency and permanent zero-gap synchronization are not accepted KPIs. Measure latency per comparable workload and show reconciliation gaps at defined checkpoints. Do not substitute CI workflow timing for application-runtime performance.
 
-Related design files: [v114.0 blueprint](PROJECT_QZ_V114_OMNIVERSAL_HYPER_NEXUS_BLUEPRINT.md), [MD-SIU specification](MD_SIU_MULTI_DIMENSIONAL_INTELLIGENCE_SPEC.md), [sync reconciliation specification](SYNC_RECONCILIATION_SPEC.md), [UVSGM matrix](UVSGM_VALUES_GOVERNANCE_MATRIX.md), and [acceptance roadmap](V114_TO_NEXT_BASELINE_ROADMAP.md).
+Related design files: [v114.0 blueprint](PROJECT_QZ_V114_OMNIVERSAL_HYPER_NEXUS_BLUEPRINT.md), [MD-SIU specification](MD_SIU_MULTI_DIMENSIONAL_INTELLIGENCE_SPEC.md), [sync reconciliation specification](SYNC_RECONCILIATION_SPEC.md), [UVSGM matrix](UVSGM_VALUES_GOVERNANCE_MATRIX.md), and [acceptance roadmap](V114_TO_NEXT_BASELINE_ROADMAP.md). The combined [v114 progress and graph report](V114_PROGRESS_AND_GRAPH_REPORT.md) separates design inventory counts from CI timing and unavailable application/runtime metrics.
 
 ## Graph B — proposed roadmap (planned time, not measured progress)
 | Workstream | Planned sequence | Status at report creation |
