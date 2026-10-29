@@ -110,6 +110,7 @@ test('stale config versions are rejected', () => {
   const changed = { ...config(), version:2 };
   assert.throws(() => applyApprovedEngineUpdate(changed, result.updateProposal, {
     status:'approved', proposalId:result.updateProposal.proposalId, reviewerId:'reviewer-2',
+    proposalFingerprint:result.updateProposal.fingerprint,
     evidenceReference:'approval:123', approvedAtUtc:'2026-10-28T10:00:00Z', baseConfigVersion:1
   }), /stale configuration version/);
 });
@@ -119,6 +120,7 @@ test('approved, independently reviewed tuning update increments version and pres
   const result = runStudyCycle(study(), base);
   const updated = applyApprovedEngineUpdate(base, result.updateProposal, {
     status:'approved', proposalId:result.updateProposal.proposalId, reviewerId:'reviewer-2',
+    proposalFingerprint:result.updateProposal.fingerprint,
     evidenceReference:'approval:123', approvedAtUtc:'2026-10-28T10:00:00Z', baseConfigVersion:1
   });
   assert.equal(updated.version, 2);
@@ -133,6 +135,7 @@ test('cannot apply an update when the current value differs from the study basel
   base.routing.confidenceThreshold = 0.88;
   assert.throws(() => applyApprovedEngineUpdate(base, result.updateProposal, {
     status:'approved', proposalId:result.updateProposal.proposalId, reviewerId:'reviewer-2',
+    proposalFingerprint:result.updateProposal.fingerprint,
     evidenceReference:'approval:123', approvedAtUtc:'2026-10-28T10:00:00Z', baseConfigVersion:1
   }), /configuration changed since the study/);
 });
