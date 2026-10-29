@@ -122,3 +122,22 @@ test('returns stable validation output for the same input', () => {
   });
   assert.deepEqual(validateRecommendationSet(input), validateRecommendationSet(input));
 });
+
+test('normalizes surrounding whitespace when checking recommendation IDs', () => {
+  const result = validateRecommendationSet(set({
+    recommendations: [
+      option({ recommendation_id: 'rec-normalized' }),
+      option({ recommendation_id: '  rec-normalized  ' })
+    ]
+  }));
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((error) => error.includes('duplicate recommendation_id: rec-normalized')));
+});
+
+test('normalizes surrounding whitespace when checking linked finding IDs', () => {
+  const result = validateRecommendationSet(set({
+    recommendations: [option({ linked_finding_ids: ['finding-002', ' finding-002 '] })]
+  }));
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((error) => error.includes('duplicate linked_finding_ids entry')));
+});
