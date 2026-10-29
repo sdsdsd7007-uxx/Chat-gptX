@@ -250,3 +250,21 @@ test('post-approval changes to proposal identity, version, route, or status are 
     assert.deepEqual(base, before);
   }
 });
+
+test('tampering with the stored fingerprint and copying it into approval is rejected', () => {
+  const base = config();
+  const result = runStudyCycle(study(), base);
+  const proposal = structuredClone(result.updateProposal);
+  proposal.fingerprint = 'f'.repeat(64);
+  const approval = {
+    status:'approved', proposalId:proposal.proposalId, reviewerId:'reviewer-2',
+    proposalFingerprint:proposal.fingerprint, evidenceReference:'approval:123',
+    approvedAtUtc:'2026-10-28T10:00:00Z', baseConfigVersion:1
+  };
+  const before = structuredClone(base);
+  assert.throws(
+    () => applyApprovedEngineUpdate(base, proposal, approval),
+    /proposal contents changed since its fingerprint was recorded/
+  );
+  assert.deepEqual(base, before);
+});
