@@ -69,6 +69,24 @@ GitHub announced Agentic Workflows general availability on 2026-10-28 and Action
 
 **Current control state:** CI-only performance graph available; application/agent production telemetry remains NOT CONNECTED. Proposal/test states remain PROPOSED — NOT RUN where stated. Production remains HOLD pending independent review, trusted authorization, staging tests, recovery/rollback proof and explicit release approval.
 
+
+
+## v114.0 concept track — Omniversal Hyper-Nexus
+
+The requested v114.0 label is maintained as a **concept/design track**, aligned to the existing Dropbox **v121.0 assurance pack**. It does not replace the current v121 record or imply production release. The v121 pack states that its tests remain NOT RUN and that production is HOLD.
+
+- [v114.0 Hyper-Nexus blueprint](PROJECT_QZ_V114_OMNIVERSAL_HYPER_NEXUS_BLUEPRINT.md)
+- [MD-SIU intelligence specification](MD_SIU_MULTI_DIMENSIONAL_INTELLIGENCE_SPEC.md)
+- [QR-DTS sync and reconciliation design](SYNC_RECONCILIATION_SPEC.md)
+- [UVSGM values governance matrix](UVSGM_VALUES_GOVERNANCE_MATRIX.md)
+- [v114 acceptance and integration roadmap](V114_TO_NEXT_BASELINE_ROADMAP.md)
+- [v114 proposed acceptance test matrix](V114_ACCEPTANCE_TEST_MATRIX.csv)
+- [Hyper-Nexus architecture map](V114_ARCHITECTURE_MAP.svg)
+- [Assurance inventory overview](V114_ASSURANCE_INVENTORY_OVERVIEW.svg)
+- [Proposed roadmap Gantt](V114_PROPOSED_ROADMAP_GANTT.svg)
+
+The inventory graph counts documented assurance records, not passed tests or real-world performance. Application/runtime telemetry remains NOT CONNECTED; the existing CI timing chart measures CI workflow wall time only. All v114 tests remain PROPOSED — NOT RUN, and production HOLD is unchanged.
+
 ## Inventory-count reconciliation — OPEN
 
 The numbers currently used across the QZ/QQQ materials describe different and not-yet-reconciled inventory concepts:
