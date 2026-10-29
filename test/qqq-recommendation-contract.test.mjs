@@ -93,3 +93,32 @@ test('rejects execution payloads inside an option', () => {
   assert.equal(result.valid, false);
   assert.ok(result.errors.some((error) => error.includes('unsupported field: tool_call')));
 });
+
+test('rejects duplicate recommendation IDs across options', () => {
+  const result = validateRecommendationSet(set({
+    recommendations: [
+      option({ recommendation_id: 'rec-duplicate' }),
+      option({ recommendation_id: 'rec-duplicate', title: 'A second option with a conflicting ID' })
+    ]
+  }));
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((error) => error.includes('duplicate recommendation_id: rec-duplicate')));
+});
+
+test('rejects duplicate linked finding IDs within an option', () => {
+  const result = validateRecommendationSet(set({
+    recommendations: [option({ linked_finding_ids: ['finding-001', 'finding-001'] })]
+  }));
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((error) => error.includes('duplicate linked_finding_ids entry')));
+});
+
+test('returns stable validation output for the same input', () => {
+  const input = set({
+    recommendations: [
+      option({ recommendation_id: 'rec-duplicate' }),
+      option({ recommendation_id: 'rec-duplicate' })
+    ]
+  });
+  assert.deepEqual(validateRecommendationSet(input), validateRecommendationSet(input));
+});
