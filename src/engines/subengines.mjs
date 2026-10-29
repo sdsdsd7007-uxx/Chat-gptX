@@ -15,8 +15,11 @@ export function evaluateSubengine(engineId, input = {}) {
   if (signal === 'pass' && evidenceReferences.length === 0) {
     return { engineId, status: 'NOT_VERIFIED', decision: 'INVESTIGATE', severity: HIGH_IMPACT.has(engineId) ? 'CRITICAL' : 'HIGH', evidenceReferences: [], reason: 'A pass signal requires at least one evidence reference.' };
   }
-  if (signal === 'not_applicable' && reason.length === 0) {
-    return { engineId, status: 'NOT_VERIFIED', decision: 'INVESTIGATE', severity: 'HIGH', evidenceReferences, reason: 'Not-applicable status requires a recorded rationale.' };
+  if (signal === 'not_applicable' && (reason.length === 0 || evidenceReferences.length === 0)) {
+    const missing = [];
+    if (reason.length === 0) missing.push('a recorded rationale');
+    if (evidenceReferences.length === 0) missing.push('at least one evidence reference');
+    return { engineId, status: 'NOT_VERIFIED', decision: 'INVESTIGATE', severity: 'HIGH', evidenceReferences, reason: 'Not-applicable status requires ' + missing.join(' and ') + '.' };
   }
   if (signal === 'pass') return { engineId, status: 'PASS', decision: 'CONTINUE', severity: 'LOW', evidenceReferences, reason: reason || 'Required checks passed with evidence.' };
   if (signal === 'not_applicable') return { engineId, status: 'NOT_APPLICABLE', decision: 'CONTINUE', severity: 'LOW', evidenceReferences, reason };
