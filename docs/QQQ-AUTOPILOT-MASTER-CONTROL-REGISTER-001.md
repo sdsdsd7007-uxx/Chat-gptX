@@ -354,3 +354,12 @@ For the next reporting cycle, record per run: UTC timestamp, exact commit SHA, w
 - **Outcome impact** = only measured against an approved baseline with source, units, observation window and attribution method; currently UNKNOWN where no verified telemetry exists.
 
 **Subproject destinations:** maintain this chart methodology in this canonical register; implementation test details remain with their owning PR/subproject; source and freshness records belong in StudyCore/DIIP evidence records; Market X may visualize approved KPI data only after adapters and provenance are verified. This documentation does not create those integrations or claim automatic scheduled execution.
+
+
+## Performance / progress telemetry — 2026-10-29
+
+The QZ Intelligence subproject now contains an evidence-backed CI workflow report with two SVG graphs and the raw GitHub Actions run extract: [QZ/ASSD Performance & Progress-over-Time Report](https://github.com/sdsdsd7007-uxx/Chat-gptX/blob/feature/qz-intelligence-subprojects-v1/docs/qz-intelligence/reports/QZ_ASSD_Performance_Progress_Report_2026-10-29.md). Source snapshot: 51 attempts on `feature/qz-assd-foundation` from 2026-10-28 09:08:55Z to 2026-10-29 10:00:25Z; 36 success, 4 failure, 11 cancelled; non-cancelled success rate 90.0%; wall-duration p50 11s and p90 15s. These measure CI workflow wall time only, not product or agent performance.
+
+Workflow inventory found no remote reusable-workflow calls in inspected PR #1/#2/#4/#5/#7/#8/#9 refs. PR #1/#2 use full-SHA action references; PR #4/#5/#7 currently use `@v7` tags for checkout/setup-node. Recommend reviewed full-SHA pins or a lockfile pilot; GitHub's documented issue #179 gap is not a confirmed exposure in the inspected files. The inventory must be repeated when workflow files change.
+
+Production remains **HOLD**. AA-001–AA-014 remain PROPOSED — NOT RUN; CI success does not close trusted authorization, independent review, staging, recovery/rollback or release approval.
