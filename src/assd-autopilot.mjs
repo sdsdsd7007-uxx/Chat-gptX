@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { evaluateAllSubengines } from './engines/subengines.mjs';
 
 const TUNABLE_PATHS = Object.freeze({
@@ -49,6 +50,25 @@ function validValue(path, value) {
 
 function nonEmptyStrings(value) {
   return Array.isArray(value) ? [...new Set(value.filter((item) => typeof item === 'string' && item.trim().length > 0))] : [];
+}
+
+function fingerprintProposal(proposal) {
+  // Fixed field order makes the digest deterministic and excludes the digest itself.
+  const canonical = {
+    proposalId: proposal.proposalId,
+    studyId: proposal.studyId,
+    baseConfigVersion: proposal.baseConfigVersion,
+    configPath: proposal.configPath,
+    baseValue: proposal.baseValue,
+    proposedValue: proposal.proposedValue,
+    rationale: proposal.rationale,
+    expectedOutcome: proposal.expectedOutcome,
+    requestedBy: proposal.requestedBy,
+    evidenceReferences: proposal.evidenceReferences,
+    status: proposal.status,
+    issues: proposal.issues
+  };
+  return createHash('sha256').update(JSON.stringify(canonical)).digest('hex');
 }
 
 export function runStudyCycle(study, config) {
@@ -114,6 +134,7 @@ export function runStudyCycle(study, config) {
       status: proposalIssues.length === 0 && issues.length === 0 ? 'PENDING_APPROVAL' : 'BLOCKED',
       issues: [...issues, ...proposalIssues]
     };
+    updateProposal.fingerprint = fingerprintProposal(updateProposal);
     if (proposalIssues.length > 0) issues.push(...proposalIssues);
   }
   const blocked = issues.length > 0 || subsystemAssessment.needsInvestigation;
@@ -138,6 +159,8 @@ export function applyApprovedEngineUpdate(config, proposal, approval) {
   if (!validUtc(approval.approvedAtUtc)) throw new Error('approval timestamp must be a real UTC ISO timestamp');
   if (proposal.baseConfigVersion !== config.version || approval.baseConfigVersion !== config.version) throw new Error('stale configuration version; regenerate and re-review proposal');
   if (!Object.hasOwn(TUNABLE_PATHS, proposal.configPath) || !validValue(proposal.configPath, proposal.proposedValue)) throw new Error('configuration update is outside the approved tuning allowlist');
+  if (proposal.fingerprint !== fingerprintProposal(proposal)) throw new Error('proposal contents changed since its fingerprint was recorded; regenerate and re-review');
+  if (approval.proposalFingerprint !== proposal.fingerprint) throw new Error('approval fingerprint does not match the proposal');
   const currentValue = readPath(config, proposal.configPath);
   if (currentValue !== proposal.baseValue) throw new Error('configuration changed since the study; regenerate proposal');
   const next = structuredClone(config);
