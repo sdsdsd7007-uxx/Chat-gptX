@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="520" viewBox="0 0 1080 520" role="img" aria-labelledby="title desc">
+<title id="title">QZ assurance inventory by release artifact</title>
+<desc id="desc">Documented counts for proposed tests, gates, risk entries and evidence links across v116 to v121. Counts describe design inventory, not passed tests or operating performance.</desc>
+<rect width="1080" height="520" fill="#fff"/>
+<text x="85" y="36" font-family="Arial" font-size="22" font-weight="700" fill="#0f172a">Assurance Inventory by Artifact Version</text>
+<text x="85" y="59" font-family="Arial" font-size="13" fill="#475569">Design inventory only; v121 values are current pack counts, not execution results.</text>
+<line x1="90" y1="410" x2="1040" y2="410" stroke="#334155"/>
+<g font-family="Arial" font-size="12" fill="#475569">
+<text x="90" y="435" text-anchor="middle">v116</text><text x="280" y="435" text-anchor="middle">v117</text><text x="470" y="435" text-anchor="middle">v118</text><text x="660" y="435" text-anchor="middle">v119</text><text x="850" y="435" text-anchor="middle">v120</text><text x="1040" y="435" text-anchor="middle">v121*</text>
+</g>
+<g fill="#2563eb">
+<circle cx="90" cy="290" r="5"/><circle cx="280" cy="226" r="5"/><circle cx="470" cy="162" r="5"/><circle cx="660" cy="114" r="5"/><circle cx="850" cy="66" r="5"/><circle cx="1040" cy="42" r="5"/>
+</g>
+<polyline points="90,290 280,226 470,162 660,114 850,66 1040,42" fill="none" stroke="#2563eb" stroke-width="3"/>
+<g fill="#16a34a">
+<circle cx="90" cy="330" r="4"/><circle cx="280" cy="314" r="4"/><circle cx="470" cy="290" r="4"/><circle cx="660" cy="274" r="4"/><circle cx="850" cy="258" r="4"/><circle cx="1040" cy="242" r="4"/>
+</g>
+<polyline points="90,330 280,314 470,290 660,274 850,258 1040,242" fill="none" stroke="#16a34a" stroke-width="2.5"/>
+<g fill="#d97706">
+<circle cx="90" cy="350" r="4"/><circle cx="280" cy="330" r="4"/><circle cx="470" cy="320" r="4"/><circle cx="660" cy="304" r="4"/><circle cx="850" cy="288" r="4"/><circle cx="1040" cy="272" r="4"/>
+</g>
+<polyline points="90,350 280,330 470,320 660,304 850,288 1040,272" fill="none" stroke="#d97706" stroke-width="2.5"/>
+<g fill="#7c3aed">
+<circle cx="90" cy="362" r="4"/><circle cx="280" cy="350" r="4"/><circle cx="470" cy="340" r="4"/><circle cx="660" cy="324" r="4"/><circle cx="850" cy="312" r="4"/><circle cx="1040" cy="300" r="4"/>
+</g>
+<polyline points="90,362 280,350 470,340 660,324 850,312 1040,300" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+<g font-family="Arial" font-size="12" fill="#334155">
+<line x1="100" y1="466" x2="126" y2="466" stroke="#2563eb" stroke-width="3"/><text x="134" y="470">Proposed tests: 30, 46, 62, 74, 86, 94</text>
+<line x1="430" y1="466" x2="456" y2="466" stroke="#16a34a" stroke-width="3"/><text x="464" y="470">Gates: 20, 24, 30, 34, 38, 42</text>
+<line x1="675" y1="466" x2="701" y2="466" stroke="#d97706" stroke-width="3"/><text x="709" y="470">Risks: 15, 20, 25, 29, 33, 37</text>
+<line x1="850" y1="494" x2="876" y2="494" stroke="#7c3aed" stroke-width="3"/><text x="884" y="498">Evidence links: 11, 17, 20, 24, 27, 30</text>
+</g>
+<text x="85" y="505" font-family="Arial" font-size="11" fill="#64748b">Source: Dropbox v121 changelog/report, 2026-10-29. Counts are not test-pass rates; all tests remain NOT RUN per the pack.</text>
+</svg>
