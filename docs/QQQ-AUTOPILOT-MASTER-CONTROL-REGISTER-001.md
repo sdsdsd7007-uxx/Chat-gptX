@@ -202,7 +202,34 @@ Each real run needs an immutable run ID, user intent, exact task scope, version/
 9. Never self-approve security-policy or authorization-boundary changes.
 10. Close a cycle when its acceptance criteria are met. A new cycle needs a defined objective and valid authority; autonomy is not permission for indefinite execution.
 
-## 8. Prioritized integration backlog
+## 8. New design output — Agent Authority Threat-to-Test Matrix
+
+Derived from NIST's 27 October 2026 *Design Tenets for Agent Identity Management Systems* and the Australian Signals Directorate's *Agentic AI Harnesses* guidance. This is a **proposed engineering test plan**, not a statement of implemented controls or an official compliance certification.
+
+| Threat / failure mode | Required invariant | Minimum negative test | Evidence to retain | Gate |
+|---|---|---|---|---|
+| Agent impersonates a user or another service | Each agent/workload/environment has a unique authenticated identity; the initiating principal is traceable | Use an unknown agent identity or substitute a user identity; deny the request | Identity-provider decision, correlation ID, audit record | P0 before tool access |
+| Delegation expands authority | A sub-agent/service can never receive broader permissions than its parent mandate | Child requests a disallowed scope, higher privilege or unrelated resource; deny it | Parent/child identity chain, scope comparison, decision record | P0 |
+| Standing credentials persist past task need | Access is least-privilege, short-lived, revocable and scoped to task/resource | Expired/revoked credential or scope mismatch; deny without retrying through broader credentials | Credential status and deterministic denial record | P0 |
+| Untrusted source text changes policy | Reasoning and external-content ingestion cannot modify authorization policy or credential scope | Inject fake instructions in a retrieved document/comment asking for a tool call or policy bypass; it remains data and is denied by policy | Original source, tool proposal, policy decision and blocked action trace | P0 |
+| Model reasoning directly decides permissions | Deterministic policy engine is the final authorization authority | Change model explanation/confidence while keeping the request and policy fixed; access result remains deterministic | Policy/config version and decision inputs | P0 |
+| Approval fatigue or bypass on sensitive operations | Material/high-impact/irreversible actions trigger the assigned human reviewer; rejection/timeout fails closed | Missing, expired, self-approved, wrong-scope, revoked or replayed approval; deny | Authenticated reviewer identity, mandate/action digest, time, revocation check, event ID | P0 |
+| Approval is not bound to exact action | Approval binds canonical action/proposal content, target, version, scope and expiry | Modify one field after approval; reject and preserve original state | Pre-approval digest, verifier result, before/after state | P0; content fingerprint is not reviewer authentication |
+| Source evidence is fabricated or swapped | Evidence provenance is checked outside model reasoning; every claim has lineage | Supply an unregistered source, invalid signature or mismatched content digest; flag UNKNOWN/INVESTIGATE | Source ID, publisher/version/time, checksum/signature result | P0 |
+| Agent tampers with its own audit trail | Audit evidence is append-only or independently protected from the acting agent | Attempt to delete/rewrite an event or reuse an event ID; reject or alert | Storage-integrity/sequence result and independent audit pointer | P1 |
+| Long-running agent drifts or over-acts | Monitored rate, scope, resource and behavior budgets have hard stop/cancel controls | Exceed call budget, time budget, resource budget or approved purpose; stop and escalate | Limit breach, cancellation record, final state | P1 |
+| Tool returns unexpected output or has side effects | Validate tool schemas, constrain output, use idempotency and quarantine/review untrusted results | Malformed output, duplicate delivery, timeout or partial failure; prevent duplicate external effects | Request/result correlation, idempotency ledger, quarantine record | P1 |
+| Lockfile is stale or incomplete | Every targeted action/reusable-workflow dependency is locked and freshness verification passes | Add/change an action dependency without regenerating the lockfile; CI freshness check fails | Generator version, lock diff, verifier result and workflow coverage list | P1; pilot while extension remains pre-1.0 |
+
+### Enforcement architecture
+
+`UNTRUSTED INPUT → REASONING / PROPOSAL → SCHEMA VALIDATION → POLICY ENGINE → AUTHENTICATED IDENTITY + SCOPED MANDATE → HUMAN GATE IF REQUIRED → TOOL HARNESS → INDEPENDENT AUDIT → OUTCOME VERIFICATION`
+
+The model can recommend an action, but it must not grant itself a permission or convert retrieved instructions into authority. The authorization service must receive a canonical request independent of the model's free-form explanation, authenticate the reviewer/service identity, and enforce scope, expiry, revocation and replay rules. Tool results return as untrusted data until validated and correlated to the request.
+
+For this repository specifically, implement the authorization service only after requirements and threat cases are independently reviewed. The current pure function that consumes a caller-supplied approval object is a starter/contract helper—not a trusted authorization server. Until a trusted identity and evidence service exists, keep any apply operation confined to deterministic offline tests and do not expose it as a production write API.
+
+## 9. Prioritized integration backlog
 
 | Priority | Work item | Acceptance evidence | Gate |
 |---|---|---|---|
@@ -220,7 +247,7 @@ Each real run needs an immutable run ID, user intent, exact task scope, version/
 | **P2** | Controlled AI-provider comparison | Common task set, dated model/provider versions, repeat counts, quality/cost/latency/privacy limits and failure analysis | No provider selected from anecdotes alone |
 | **P2** | Crypto-agility inventory | Algorithm/protocol inventory, data-lifetime prioritization and migration owner/plan | No unverified PQC certification claim |
 
-## 9. Merge and release sequence
+## 10. Merge and release sequence
 
 1. Preserve all three drafts and record their exact heads.
 2. Complete the P0 approval-boundary fix and tests on a dedicated branch.
@@ -233,7 +260,7 @@ Each real run needs an immutable run ID, user intent, exact task scope, version/
 
 This runbook does not perform steps 2–8 by itself. Actual changes and releases remain subject to the documented gates.
 
-## 10. Completion definitions
+## 11. Completion definitions
 
 - **DONE 1 — DESIGNED:** canonical registry, interfaces, dependencies, decision gates and test criteria are documented.
 - **DONE 2 — VERIFIED:** exact-version tests, provenance checks, negative tests, independent review and rollback evidence are complete.
