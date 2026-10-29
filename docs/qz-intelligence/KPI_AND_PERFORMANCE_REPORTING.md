@@ -47,6 +47,22 @@ These data measure **CI workflow duration**, not end-to-end agent performance, p
 
 ![Observed CI workflow outcomes](reports/CI_OUTCOME_DISTRIBUTION.svg)
 
+## v114.0 concept-track metrics — design status
+
+The v114.0 concept adds three design areas: MD-SIU (evidence-backed analysis and evaluation), QR-DTS (source-aware record reconciliation and recovery) and UVSGM (value-to-control mapping). These are **proposed design components**, not running services.
+
+| Metric family | Example measure | Current status |
+|---|---|---|
+| Analysis quality | Provenance coverage, unsupported-claim rate, held-out calibration | NOT CONNECTED / NOT MEASURED |
+| Synchronization | Duplicate updates, detected missing records, unresolved gap per verified checkpoint | PROPOSED — NOT RUN |
+| Governance | Reviewed rules, tested rules, correction/appeal evidence | PROPOSED — NOT RUN |
+| Post-quantum readiness | Endpoint inventory, supported versions and interoperability evidence | NOT VERIFIED |
+| Recovery | Restore/reconciliation success and elapsed time on approved test data | NOT EVIDENCED |
+
+The connected Dropbox v121.0 assurance pack remains the existing baseline; this v114.0 track must not replace it. Its proposed tests remain NOT RUN and production remains HOLD. Zero latency and permanent zero-gap synchronization are not accepted KPIs. Measure latency per comparable workload and show reconciliation gaps at defined checkpoints. Do not substitute CI workflow timing for application-runtime performance.
+
+Related design files: [v114.0 blueprint](PROJECT_QZ_V114_OMNIVERSAL_HYPER_NEXUS_BLUEPRINT.md), [MD-SIU specification](MD_SIU_MULTI_DIMENSIONAL_INTELLIGENCE_SPEC.md), [sync reconciliation specification](SYNC_RECONCILIATION_SPEC.md), [UVSGM matrix](UVSGM_VALUES_GOVERNANCE_MATRIX.md), and [acceptance roadmap](V114_TO_NEXT_BASELINE_ROADMAP.md).
+
 ## Graph B — proposed roadmap (planned time, not measured progress)
 | Workstream | Planned sequence | Status at report creation |
 |---|---|---|
