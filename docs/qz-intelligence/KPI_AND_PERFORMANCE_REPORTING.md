@@ -37,6 +37,16 @@ Time → T1   T2   T3   T4   T5
 
 Do not interpret this as zero performance. Replace with a real chart only when source, timestamps, unit, sample count and at least two valid observations are available to support a trend.
 
+## Observed CI pipeline graph snapshot — 2026-10-29 (not production telemetry)
+
+The new [QZ/ASSD performance and progress report](https://github.com/sdsdsd7007-uxx/Chat-gptX/blob/feature/qz-intelligence-subprojects-v1/docs/qz-intelligence/reports/QZ_ASSD_Performance_Progress_Report_2026-10-29.md) contains two source-backed SVGs and the 51-row workflow-run source extract: [duration trend and outcome mix](https://github.com/sdsdsd7007-uxx/Chat-gptX/tree/feature/qz-intelligence-subprojects-v1/docs/qz-intelligence/reports). The observed scope is the GitHub Actions validation workflow on `feature/qz-assd-foundation` only. It records 51 attempts, of which 36 succeeded, 4 failed and 11 were cancelled; among non-cancelled attempts, 36/40 succeeded (90.0%). Run-start-to-final-update latency was p50 11s and p90 15s.
+
+These data measure **CI workflow duration**, not end-to-end agent performance, production request latency, business impact or user outcomes. Production-engine telemetry remains NOT CONNECTED. Preserve the Graph A empty-state rule for any uninstrumented production metric; do not infer production performance from CI timing.
+
+![Observed CI workflow duration](reports/CI_DURATION_TREND.svg)
+
+![Observed CI workflow outcomes](reports/CI_OUTCOME_DISTRIBUTION.svg)
+
 ## Graph B — proposed roadmap (planned time, not measured progress)
 | Workstream | Planned sequence | Status at report creation |
 |---|---|---|
