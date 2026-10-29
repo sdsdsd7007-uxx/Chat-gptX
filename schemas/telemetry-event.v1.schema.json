@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project QZ Telemetry Event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project",
+    "framework",
+    "execution_id",
+    "event_id",
+    "node_id",
+    "module",
+    "event_type",
+    "timestamp_utc",
+    "status",
+    "data_quality",
+    "environment",
+    "redaction_status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project": {
+      "const": "QZ"
+    },
+    "framework": {
+      "const": "ASSD"
+    },
+    "execution_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "node_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "module": {
+      "type": "string",
+      "enum": [
+        "MCU",
+        "CERE",
+        "ARRE",
+        "IPSU",
+        "MASTER_CONTROL",
+        "TELEMETRY",
+        "OTHER"
+      ]
+    },
+    "event_type": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "timestamp_utc": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "Z$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "started",
+        "succeeded",
+        "failed",
+        "rejected",
+        "quarantined",
+        "investigating",
+        "corrected",
+        "verified"
+      ]
+    },
+    "data_quality": {
+      "type": "string",
+      "enum": [
+        "valid",
+        "invalid",
+        "unknown"
+      ]
+    },
+    "duration_ms": {
+      "type": "number",
+      "minimum": 0
+    },
+    "retry_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical",
+        "unknown"
+      ]
+    },
+    "approval_required": {
+      "type": "boolean"
+    },
+    "owner_id": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "evidence_reference": {
+      "type": "string",
+      "maxLength": 2048
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "source_version": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "environment": {
+      "type": "string",
+      "enum": [
+        "local",
+        "test",
+        "staging",
+        "production"
+      ]
+    },
+    "redaction_status": {
+      "type": "string",
+      "enum": [
+        "checked",
+        "redacted",
+        "not_checked",
+        "not_applicable"
+      ]
+    },
+    "financial_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "currency",
+        "value"
+      ],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": [
+            "forecast",
+            "estimated",
+            "attributed",
+            "realized"
+          ]
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "value": {
+          "type": "number"
+        },
+        "source_reference": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "reconciled": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "classification": {
+                "const": "realized"
+              }
+            },
+            "required": [
+              "classification"
+            ]
+          },
+          "then": {
+            "required": [
+              "source_reference",
+              "reconciled"
+            ],
+            "properties": {
+              "source_reference": {
+                "minLength": 1
+              },
+              "reconciled": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
