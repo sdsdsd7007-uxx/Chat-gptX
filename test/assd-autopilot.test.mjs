@@ -151,3 +151,30 @@ test('invalid confidence policy blocks the study rather than falling back silent
   assert.equal(result.state, 'INVESTIGATE');
   assert.ok(result.issues.some((item) => item.includes('minStudyConfidence')));
 });
+
+test('not-applicable subengine without evidence blocks study updates', () => {
+  const input = study();
+  input.subsystems.CERE.status = 'not_applicable';
+  input.subsystems.CERE.evidenceReferences = [];
+  input.subsystems.CERE.reason = 'No resource-flow domain applies to this test.';
+  const result = runStudyCycle(input, config());
+  const cere = result.subengines.find((item) => item.engineId === 'CERE');
+  assert.equal(result.state, 'INVESTIGATE');
+  assert.equal(cere.status, 'NOT_VERIFIED');
+  assert.equal(cere.decision, 'INVESTIGATE');
+  assert.match(cere.reason, /evidence reference/);
+  assert.equal(result.updateProposal.status, 'BLOCKED');
+});
+
+test('not-applicable subengine with registered evidence and rationale remains explicit', () => {
+  const input = study();
+  input.subsystems.CERE.status = 'not_applicable';
+  input.subsystems.CERE.evidenceReferences = ['evidence:study-001'];
+  input.subsystems.CERE.reason = 'No resource-flow domain applies to this test.';
+  const result = runStudyCycle(input, config());
+  const cere = result.subengines.find((item) => item.engineId === 'CERE');
+  assert.equal(result.state, 'REVIEW_UPDATE');
+  assert.equal(cere.status, 'NOT_APPLICABLE');
+  assert.equal(cere.decision, 'CONTINUE');
+  assert.equal(result.updateProposal.status, 'PENDING_APPROVAL');
+});
