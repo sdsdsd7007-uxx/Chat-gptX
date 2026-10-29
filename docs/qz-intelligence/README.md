@@ -84,6 +84,7 @@ The requested v114.0 label is maintained as a **concept/design track**, aligned 
 - [Hyper-Nexus architecture map](V114_ARCHITECTURE_MAP.svg)
 - [Assurance inventory overview](V114_ASSURANCE_INVENTORY_OVERVIEW.svg)
 - [Proposed roadmap Gantt](V114_PROPOSED_ROADMAP_GANTT.svg)
+- [v114 progress and graph report](V114_PROGRESS_AND_GRAPH_REPORT.md)
 
 The inventory graph counts documented assurance records, not passed tests or real-world performance. Application/runtime telemetry remains NOT CONNECTED; the existing CI timing chart measures CI workflow wall time only. All v114 tests remain PROPOSED — NOT RUN, and production HOLD is unchanged.
 
