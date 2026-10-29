@@ -58,3 +58,30 @@ DONE 2 — VERIFIED: implementation, tests, provenance, independent review and r
 DONE 3 — APPROVED & OPERATIONAL: authorized release, monitored outcomes and verified recovery.
 
 Current proposal status: **documentation created; independent review and implementation validation pending. DONE 2 and DONE 3 are not claimed.**
+
+## Workflow supply-chain gate — proposed
+
+**Status: REQUIRED REVIEW CONTROL; NOT IMPLEMENTED OR VERIFIED IN THIS PR.**
+
+GitHub announced workflow dependency lockfiles as generally available on 28 October 2026. Before adopting enforcement, inventory every workflow and dependency, review the resolved upstream sources, generate the lockfile with the official `gh actions-lock` extension, review the full diff, and verify lockfile coverage and currentness in CI. Never hand-author lockfile hashes. A lockfile pins covered action dependencies; it does not establish that a dependency is safe.
+
+**Important coverage boundary:** GitHub's workflow-lockfile documentation states that lockfiles do **not** pin reusable-workflow calls at `jobs.<job_id>.uses`. Pin remote reusable-workflow references to a reviewed full commit SHA and separately review the called repository and its own workflow dependencies. Inventory local actions and container images separately; a lockfile is not a universal build-input lock.
+
+**Adoption sequence**
+1. Enumerate all `.github/workflows/**` files, action references, composite/local actions, remote reusable workflows, container images and permission scopes.
+2. Review triggers and trust boundaries, especially untrusted pull-request code, token permissions, secrets exposure, and privileged events.
+3. Generate the lockfile with the official tool only after reviewing current references; inspect generated workflow rewrites and lockfile changes as code.
+4. Test a non-mutating lockfile verification check and a negative case that deliberately leaves a dependency unrecorded.
+5. Confirm exact-head CI, dependency coverage, repository policy compatibility, and a recovery path before considering enforcement. Do not activate a repository-wide Require lockfile policy until coverage is demonstrated for every targeted workflow.
+6. Have an independent reviewer verify the workflow inventory, lockfile, full-SHA reusable-workflow pins, least-privilege permissions, and evidence.
+
+**Acceptance evidence required:** commit SHA; inventory of workflow paths and dependency types; generated lockfile and reviewed diff; verification run ID/result; reusable-workflow full-SHA references; exception register; reviewer identity and decision; timestamped audit evidence.
+
+**Official references**
+- GitHub GA announcement (28 October 2026): https://github.blog/changelog/2026-10-28-github-actions-workflow-lockfiles-are-generally-available/
+- Workflow dependency lockfile scope and reusable-workflow limitation: https://docs.github.com/en/enterprise-cloud%40latest/actions/concepts/security/workflow-dependency-lockfiles
+- Secure use of GitHub Actions: https://docs.github.com/en/actions/reference/security/secure-use
+- Official lockfile generator: https://github.com/github/gh-actions-lock
+
+**Release state remains unchanged:** no repository workflow inventory or lockfile generation is claimed by this documentation update. Exact-head CI, independent review, staging acceptance, recovery/rollback and authorized release approval remain separate gates; production stays **HOLD**.
+
