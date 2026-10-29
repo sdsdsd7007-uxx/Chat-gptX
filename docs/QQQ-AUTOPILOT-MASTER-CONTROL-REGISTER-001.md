@@ -101,7 +101,11 @@ Microsoft Security Research reported a July 2026 AsyncAPI npm supply-chain compr
 
 Source: Microsoft Security Blog, *Unpacking the AsyncAPI npm supply chain compromise and import-time payload delivery* (15 July 2026): https://www.microsoft.com/en-us/security/blog/2026/07/15/unpacking-asyncapi-npm-supply-chain-compromise-import-time-payload-delivery/
 
-**Implementation consequence for QZ:** inventory every workflow and reusable workflow across `main` and the active feature branches; review triggers and whether any privileged context consumes untrusted PR content; minimize token permissions and persisted checkout credentials; scrutinize secrets and OIDC publishing trust; pilot the official generator and review diffs; add a non-mutating lock freshness check; and record exactly which workflows are covered. Do not hand-author lock hashes or enable a repository-wide Require lockfile policy before coverage, reviewer ownership and update procedures are proven. Do not run suspicious dependencies or payloads as a research shortcut. No dependency audit or incident-response conclusion is claimed until the actual dependency inventory, manifests, workflows and current commit are examined.
+**New, material limitation discovered in official tool issue #179 (opened 16 October, still open when checked 29 October 2026):** the `github/gh-actions-lock` CLI extension v0.2.0 may omit remote reusable-workflow calls at `jobs.<id>.uses` from `actions.lock`; its `--verify` can still pass even when such a call remains tag-pinned and unlocked. A maintainer acknowledged on 20 October that the docs were misleading and said the short-term approach would be optional SHA-pinning in workflow YAML rather than including job-level calls in the lockfile. Treat this as an actual coverage gap, not a theoretical edge case.
+
+**Implementation consequence for QZ:** inventory every workflow and reusable workflow across `main` and active feature branches. For every remote `jobs.<id>.uses` call, review and pin a full commit SHA directly in YAML, verify that SHA belongs to the intended upstream repository, and review the called repository's own workflow dependencies separately. Do not count the caller lockfile or a passing `gh actions-lock --verify` as coverage for remote reusable workflows. For step-level actions, pilot the official generator, inspect direct/transitive dependency changes, add freshness verification and record exact coverage. Keep any repository-wide Require lockfile policy inactive until all workflows and known limitations are addressed by tested controls and an independent reviewer. Also review privileged triggers, token permissions, checkout credentials, caches, secrets, CODEOWNERS, Dependabot, OIDC publishing and artifacts. Never hand-author lock hashes or run suspicious payloads for research. No dependency audit or incident-response conclusion is claimed until manifests, all workflows and the current commit are examined.
+
+Source: https://github.com/github/gh-actions-lock/issues/179
 
 ### 4.4 Post-quantum cryptography: inventory and migration, not a made-up “level”
 
@@ -206,20 +210,22 @@ Each real run needs an immutable run ID, user intent, exact task scope, version/
 
 Derived from NIST's 27 October 2026 *Design Tenets for Agent Identity Management Systems* and the Australian Signals Directorate's *Agentic AI Harnesses* guidance. This is a **proposed engineering test plan**, not a statement of implemented controls or an official compliance certification.
 
-| Threat / failure mode | Required invariant | Minimum negative test | Evidence to retain | Gate |
-|---|---|---|---|---|
-| Agent impersonates a user or another service | Each agent/workload/environment has a unique authenticated identity; the initiating principal is traceable | Use an unknown agent identity or substitute a user identity; deny the request | Identity-provider decision, correlation ID, audit record | P0 before tool access |
-| Delegation expands authority | A sub-agent/service can never receive broader permissions than its parent mandate | Child requests a disallowed scope, higher privilege or unrelated resource; deny it | Parent/child identity chain, scope comparison, decision record | P0 |
-| Standing credentials persist past task need | Access is least-privilege, short-lived, revocable and scoped to task/resource | Expired/revoked credential or scope mismatch; deny without retrying through broader credentials | Credential status and deterministic denial record | P0 |
-| Untrusted source text changes policy | Reasoning and external-content ingestion cannot modify authorization policy or credential scope | Inject fake instructions in a retrieved document/comment asking for a tool call or policy bypass; it remains data and is denied by policy | Original source, tool proposal, policy decision and blocked action trace | P0 |
-| Model reasoning directly decides permissions | Deterministic policy engine is the final authorization authority | Change model explanation/confidence while keeping the request and policy fixed; access result remains deterministic | Policy/config version and decision inputs | P0 |
-| Approval fatigue or bypass on sensitive operations | Material/high-impact/irreversible actions trigger the assigned human reviewer; rejection/timeout fails closed | Missing, expired, self-approved, wrong-scope, revoked or replayed approval; deny | Authenticated reviewer identity, mandate/action digest, time, revocation check, event ID | P0 |
-| Approval is not bound to exact action | Approval binds canonical action/proposal content, target, version, scope and expiry | Modify one field after approval; reject and preserve original state | Pre-approval digest, verifier result, before/after state | P0; content fingerprint is not reviewer authentication |
-| Source evidence is fabricated or swapped | Evidence provenance is checked outside model reasoning; every claim has lineage | Supply an unregistered source, invalid signature or mismatched content digest; flag UNKNOWN/INVESTIGATE | Source ID, publisher/version/time, checksum/signature result | P0 |
-| Agent tampers with its own audit trail | Audit evidence is append-only or independently protected from the acting agent | Attempt to delete/rewrite an event or reuse an event ID; reject or alert | Storage-integrity/sequence result and independent audit pointer | P1 |
-| Long-running agent drifts or over-acts | Monitored rate, scope, resource and behavior budgets have hard stop/cancel controls | Exceed call budget, time budget, resource budget or approved purpose; stop and escalate | Limit breach, cancellation record, final state | P1 |
-| Tool returns unexpected output or has side effects | Validate tool schemas, constrain output, use idempotency and quarantine/review untrusted results | Malformed output, duplicate delivery, timeout or partial failure; prevent duplicate external effects | Request/result correlation, idempotency ledger, quarantine record | P1 |
-| Lockfile is stale or incomplete | Every targeted action/reusable-workflow dependency is locked and freshness verification passes | Add/change an action dependency without regenerating the lockfile; CI freshness check fails | Generator version, lock diff, verifier result and workflow coverage list | P1; pilot while extension remains pre-1.0 |
+| Test ID | Threat / failure mode | Required invariant | Minimum negative test | Evidence to retain | Gate |
+|---|---|---|---|---|---|
+| AA-001 | Agent impersonates a user or another service | Each agent/workload/environment has a unique authenticated identity; the initiating principal is traceable | Use an unknown agent identity or substitute a user identity; deny the request | Identity-provider decision, correlation ID, audit record | P0 before tool access |
+| AA-002 | Delegation expands authority | A sub-agent/service can never receive broader permissions than its parent mandate | Child requests a disallowed scope, higher privilege or unrelated resource; deny it | Parent/child identity chain, scope comparison, decision record | P0 |
+| AA-003 | Standing credentials persist past task need | Access is least-privilege, short-lived, revocable and scoped to task/resource | Expired/revoked credential or scope mismatch; deny without retrying through broader credentials | Credential status and deterministic denial record | P0 |
+| AA-004 | Untrusted source text changes policy | Reasoning and external-content ingestion cannot modify authorization policy or credential scope | Inject fake instructions in retrieved content asking for a tool call or policy bypass; treat it as data and deny unauthorized action | Original source, tool proposal, policy decision and blocked action trace | P0 |
+| AA-005 | Model reasoning directly decides permissions | Deterministic policy engine is the final authorization authority | Change model explanation/confidence while request and policy stay fixed; result remains deterministic | Policy/config version and decision inputs | P0 |
+| AA-006 | Sensitive action bypasses human gate | Material/high-impact/irreversible actions trigger the assigned human reviewer; rejection/timeout fails closed | Missing, expired, self-approved, wrong-scope, or revoked approval; deny | Authenticated reviewer identity, mandate/action digest, time, revocation check, event ID | P0 |
+| AA-007 | Approval replay or action mutation | Approval binds canonical content, target, version, scope, expiry; replay is rejected | Reuse approval or alter one material field after approval; reject and preserve state | Digest, verification result, before/after state | P0; fingerprint is not reviewer authentication |
+| AA-008 | Source evidence is fabricated or swapped | Evidence provenance is checked outside model reasoning; every material claim has lineage | Use unregistered source, changed content digest, invalid signature or mismatched source ID | Source/publisher/version/time, checksum/signature result | P0 |
+| AA-009 | Agent tampers with its own audit trail | Authoritative audit evidence is independently protected from the acting agent | Attempt event deletion/rewrite, duplicate ID or sequence rollback; reject or alert | Storage integrity, sequence result and independent audit pointer | P1 |
+| AA-010 | Long-running agent drifts or over-acts | Hard time/tool/cost/scope budgets stop the run; cancellation works | Exceed synthetic budgets or drift outside mandate; stop and escalate | Budget counters, cancellation reason, final run state | P1 |
+| AA-011 | Tool returns malformed output or duplicates side effects | Validate tool output, use idempotency, bound retries and quarantine malformed responses | Malformed output, duplicate delivery, timeout after simulated side effect | Request/result correlation, schema error, idempotency ledger and retry trace | P1 |
+| AA-012 | Step-level action lock is stale/incomplete | Every targeted step-level action and transitive action dependency has reviewed lock coverage | Change/add a step action without regenerating the lockfile; verify must fail | Generator version, lock diff, freshness verifier output and coverage inventory | P1; extension is pre-1.0 |
+| AA-013 | Approval fatigue causes habitual consent | Human review is risk-based and informative; repeated prompts never auto-approve | Repeat high-risk approval prompts in a synthetic test; verify escalation remains meaningful and no automatic approval occurs | Prompt rate, decisions, exception thresholds and reviewer feedback | P1 |
+| AA-014 | Remote reusable workflow escapes lock coverage | Every remote `jobs.<id>.uses` reference is pinned to a reviewed full commit SHA unless an independently verified control proves equivalent | In an isolated fixture, use a remote reusable workflow at a tag; inspect lockfile and run `--verify`; do not assume pass means locked because extension issue #179 documents a case where the reference is omitted and verification passes | Workflow fixture, exact source-repository commit, lock output, verification output, reviewed YAML diff | P0 for any reusable workflow; extension gap documented in issue #179 |
 
 ### Enforcement architecture
 
@@ -228,6 +234,10 @@ Derived from NIST's 27 October 2026 *Design Tenets for Agent Identity Management
 The model can recommend an action, but it must not grant itself a permission or convert retrieved instructions into authority. The authorization service must receive a canonical request independent of the model's free-form explanation, authenticate the reviewer/service identity, and enforce scope, expiry, revocation and replay rules. Tool results return as untrusted data until validated and correlated to the request.
 
 For this repository specifically, implement the authorization service only after requirements and threat cases are independently reviewed. The current pure function that consumes a caller-supplied approval object is a starter/contract helper—not a trusted authorization server. Until a trusted identity and evidence service exists, keep any apply operation confined to deterministic offline tests and do not expose it as a production write API.
+
+### Test-plan handoff to the master spreadsheet
+
+The master spreadsheet `Project QZ — ASSD Master Control & Telemetry Register` now has an **Agent Authority Tests** tab with 14 proposed AA-001–AA-014 cases, all explicitly **PROPOSED — NOT RUN**. These supplement—but do not replace, renumber or claim completion of—the existing QZ-AT-001–QZ-AT-023 staging suite. The Risk & QA tab now carries R-23 (identity/delegated authority), R-24 (prompt injection/harness control) and R-25 (audit integrity/approval fatigue). Action Plan rows 30–32 cover trusted authorization, offline test implementation and cautious workflow-lock adoption. CI Evidence Log entries QZ-SEC-0006–QZ-SEC-0010 are research/control records, not test pass evidence. These spreadsheet writes were read back for verification. The current register does not claim live integrations or production readiness.
 
 ## 9. Prioritized integration backlog
 
@@ -241,7 +251,8 @@ For this repository specifically, implement the authorization service only after
 | **P1** | Complete threat-to-test mapping | Applicable QSEC rows converted to synthetic regression tests; not-applicable rows clearly recorded | No compliance claim from a plan alone |
 | **P1** | Resolve 12-versus-8 project count | Define whether the counts mean domains, projects or workstreams; one canonical registry and automated consistency check | No conflicting “fully synchronized” claims |
 | **P1** | Verify dashboard behavior | Deterministic headless click-through, keyboard/navigation check, empty/error states, stale/live labels and export validation | Do not rely on a timed-out visual test |
-| **P1** | Close workflow dependency-locking gap | Inventory every workflow/reusable workflow; use official `gh actions-lock` tooling and review generated dependencies; add a non-mutating freshness check; separately review privileged triggers, token scope, persisted credentials, secrets and publishing trust | Do not hand-author hashes or infer dependencies are safe because they are locked |
+| **P0** | Close remote reusable-workflow coverage gap | Inventory all `jobs.<id>.uses` calls; pin each remote reusable workflow to a reviewed full commit SHA in YAML; check upstream repository identity; review the called repository and its own action lockfile; test the known extension #179 case because `--verify` may pass without covering the call | Do not treat lockfile or `--verify` success as coverage for remote reusable workflows |
+| **P1** | Pilot step-level workflow dependency locking | Inventory workflows; pilot official `gh actions-lock` generation for step-level actions/transitive dependencies; review generated diffs; add non-mutating freshness verification; maintain reviewer ownership and updates | Platform feature is GA, but CLI extension remains public preview/pre-1.0; no hand-written hashes or early enforcement |
 | **P1** | Establish evidence/KPI register | Source, owner, units, formula, timestamp, freshness SLA and status for each initial KPI | No fake live values |
 | **P2** | StudyCore bibliography reconciliation | Verified title/author/edition/contents/page references; explicit gaps and rights notes | Do not describe incomplete study as completed |
 | **P2** | Controlled AI-provider comparison | Common task set, dated model/provider versions, repeat counts, quality/cost/latency/privacy limits and failure analysis | No provider selected from anecdotes alone |
@@ -249,14 +260,14 @@ For this repository specifically, implement the authorization service only after
 
 ## 10. Merge and release sequence
 
-1. Preserve all three drafts and record their exact heads.
-2. Complete the P0 approval-boundary fix and tests on a dedicated branch.
-3. Create a temporary integration branch from the agreed release base; bring in the overlapping telemetry, schema, QQQ and v100 changes deliberately.
-4. Run tests and security checks on the integration commit, not on predecessor SHAs.
-5. Verify current-head CI, dashboard smoke tests, acceptance tests, source provenance and rollback.
-6. Request independent review from an authorized reviewer who did not author/approve their own change.
-7. Obtain the required explicit release approval; only then merge and stage/deploy under the owner's change-control process.
-8. Observe the staged result, validate restoration, and promote only with evidence. Otherwise revert or remain on HOLD.
+1. Preserve the two stacks (#1→#2 and #5→#7), separate PR #4, and documentation PR #8; record exact heads.
+2. Resolve trust-boundary and agent-authority requirements with an independent security reviewer; do not use caller-supplied approval JSON as the production authorization authority.
+3. Inventory all workflow and reusable-workflow dependencies; full-SHA pin remote `jobs.<id>.uses` calls because current `gh-actions-lock` verification may not cover them; pilot step-level locking separately.
+4. Create a temporary integration branch from the agreed release base; bring in overlapping telemetry, schema, QQQ and v100 changes deliberately.
+5. Run combined tests, threat-to-test cases, dashboard smoke tests and source-provenance checks on the integration commit, not predecessor SHAs.
+6. Execute QZ-AT-001–023 and the proposed AA-001–AA-014 cases only in an authorized non-production environment; retain evidence and prove recovery/rollback.
+7. Request independent review from an authorized reviewer who did not author/approve their own change; verify exact-head CI and required governance controls.
+8. Obtain explicit release approval; only then merge and stage/deploy under the owner's change-control process. Observe the staged result and promote only with evidence; otherwise revert or remain on HOLD.
 
 This runbook does not perform steps 2–8 by itself. Actual changes and releases remain subject to the documented gates.
 
@@ -283,5 +294,6 @@ This runbook does not perform steps 2–8 by itself. Actual changes and releases
 6. Uganda Ministry of Finance, Planning and Economic Development — *Performance of the Economy Report, September 2026*: https://mepd.finance.go.ug/documents/POE/2026/POE-2026-09-SEP.html
 7. GitHub Changelog — *GitHub Actions workflow lockfiles are generally available*, 28 October 2026: https://github.blog/changelog/2026-10-28-github-actions-workflow-lockfiles-are-generally-available/
 8. GitHub Docs — *Workflow dependency lockfiles*: https://docs.github.com/en/enterprise-cloud%40latest/actions/concepts/security/workflow-dependency-lockfiles
-9. Official GitHub CLI extension — `github/gh-actions-lock` (currently marked public preview / pre-1.0): https://github.com/github/gh-actions-lock
-10. Microsoft Security Blog — *Disrupting supply chain attacks on npm and GitHub Actions*, 28 July 2026: https://github.blog/security/supply-chain-security/disrupting-supply-chain-attacks-on-npm-and-github-actions/
+9. Official GitHub CLI extension — `github/gh-actions-lock` (public preview / pre-1.0): https://github.com/github/gh-actions-lock
+10. `github/gh-actions-lock` issue #179 — remote reusable workflow references omitted from lock coverage; opened 16 October 2026: https://github.com/github/gh-actions-lock/issues/179
+11. Microsoft Security Blog — *Disrupting supply chain attacks on npm and GitHub Actions*, 28 July 2026: https://github.blog/security/supply-chain-security/disrupting-supply-chain-attacks-on-npm-and-github-actions/
