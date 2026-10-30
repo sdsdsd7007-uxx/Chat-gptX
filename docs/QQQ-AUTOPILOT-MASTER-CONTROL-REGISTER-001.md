@@ -478,3 +478,45 @@ The earlier uncertainty is resolved by inspecting the exact Actions job and raw 
 **Remaining governance and release state:** PR #7 remains OPEN / DRAFT / UNMERGED. The latest review-list query returned zero submitted reviews for PR #7. Across the seven inspected PRs, independent review submissions remain 0/7 in the latest recorded audit. QZ-AT-001–023 remain NOT RUN; AA-001–014 remain PROPOSED — NOT RUN; staging/recovery evidence and Market X live KPI baselines remain unverified/unknown. Production remains **HOLD**.
 
 **Next highest-value action:** obtain an independent security/application review for the PR #2 SR-10 and PR #4 caller-supplied approval/evidence trust boundaries; then run the approved acceptance and authority suites in authorized staging and retain recovery/rollback evidence. No merge, deployment, admin-policy change, secret access or production write was performed by this verification.
+
+
+## 13.10 Release-gate execution planning and preliminary code review — 2026-10-30
+
+**Scope and independence statement:** this is an assistant-generated, source-inspected preliminary technical assessment to prepare an independent review. It is not an independent reviewer submission, penetration test, staging execution, legal/compliance approval, or release approval. No test in the acceptance register is marked passed by this section.
+
+### A. Trust-boundary findings to put before the independent reviewer
+
+| ID | Area | Source-inspected observation | Required reviewer decision |
+|---|---|---|---|
+| PRE-01 | PR #2 / Project Q replay ledger | `consume_approval()` accepts a caller-provided `GateDecision` object and checks `allowed`, digest and policy-version binding before consuming an approval ID/nonce. The replay-ledger unit tests construct `GateDecision(True, ...)` directly. The helper itself does not verify the release-gate signature, authenticate the decision issuer, or establish that the object came from the trusted policy evaluator. | Keep this helper non-production. Design a server-side boundary that recomputes policy evaluation from the signed evidence record and trusted key/revocation state; do not accept a caller-supplied positive decision as authorization. Add forged-decision, untrusted-caller and replay tests at that boundary. |
+| PRE-02 | PR #4 / ASSD approval | `applyApprovedEngineUpdate()` checks an ordinary caller-supplied approval object for status, proposal ID, reviewer string different from requester, evidence-reference string, UTC-shaped timestamp, base version and proposal fingerprint. Those checks do not authenticate reviewer identity/role, verify a signed approval, check expiry/revocation, enforce a trusted approval ID/nonce, or prove the evidence reference. | Do not expose as an authorization API. Require trusted server-side identity and role authorization, exact action/environment/version binding, short expiry, revocation, one-time use and append-only audit before any real configuration write. |
+| PRE-03 | PR #4 / evidence provenance | Study source references and MCU/CERE/ARRE/IPSU status/evidence values are inputs. The module checks reference membership and required fields but does not resolve publisher identity, fetch source content, verify signatures/checksums against a trusted registry, or establish that evidence supports a claim. | Add approved source adapters and provenance verification; retain UNKNOWN / INVESTIGATE until source and claim validation are evidenced. |
+| PRE-04 | PR #4 / workflow dependencies | Current inspected PR #4 workflow uses version tags for checkout/setup-node. No lockfile is present in the inspected branch inventory. | Independent reviewer/platform owner to decide reviewed full-SHA pins or a generated lockfile pilot. Do not self-approve or enforce repository policy. |
+
+These are bounded design observations, not a claim of exploitation or compromise.
+
+### B. Acceptance-test execution classification
+
+The spreadsheet acceptance register QZ-AT-001–023 remains **NOT RUN**. Passing unit/contract CI is not acceptance-test execution. Use the following split to prevent staging-dependent tests from being falsely marked complete:
+
+- **Potential offline/CI fixture preparation or partial coverage:** QZ-AT-001, 003, 004, 017, 021, 022 and 023. Existing schema/validator/ASSD tests may cover portions of these controls, but no acceptance ID is credited as passed until the named acceptance procedure is executed, its exact evidence is attached, and the designated reviewer accepts it.
+- **Requires authorized non-production integration/staging:** QZ-AT-002 (channel failover), 005 (end-to-end idempotency), 006 (retry/dead-letter), 014 (integrated redaction/log scan), 015 (restore with measured RTO/RPO), 016 (cross-stage trace correlation), 018 (rollback/kill switch), and 019 (approved load profile).
+- **Requires human governance, platform, domain or source-of-record evidence:** QZ-AT-007 (permissions/service identities), 008 (human approval boundary), 009 (approved jurisdictional materiality rules), 010 (approved resource accounting), 011 (risk/resilience targets), 012 (finance source reconciliation), 013 (owned/live KPI sources and baselines), and 020 (independent release readiness sign-off).
+
+Before staging execution, the accountable owner must approve the environment, test data class, service identities/scopes, test windows, stop conditions, rollback plan and named independent reviewers. No staging endpoint or authorized owner was confirmed in the current inspection; therefore no staging test was run.
+
+### C. Agent Authority test execution classification
+
+AA-001–014 remain **PROPOSED — NOT RUN**. The highest-priority cases AA-001–008 depend on a real trusted identity/authorization boundary, signed/verified approvals, delegated-scope enforcement, trusted evidence provenance, expiry/revocation and replay controls. They cannot be passed by constructing mock approval JSON alone. AA-009–011 require an authoritative audit store and controlled harness/runtime fixtures. AA-012 requires an actual reviewed lockfile/tool version and a fixture run. AA-013 requires a defined human-review policy and measured prompt workflow. AA-014 is conditional: the inspected repository workflow inventory found no remote `jobs.<id>.uses` calls, but an isolated tool-coverage fixture can still test the known CLI limitation if the lock tool is adopted. None is credited as passed.
+
+### D. Current gate decision
+
+- Implementation exact-head CI: **5/5 (100%)** for PRs #1, #2, #4, #5 and #7.
+- Independent reviews: **0/7 submitted** in the latest review-list queries.
+- QZ acceptance: **0/23 executed**.
+- Agent Authority: **0/14 executed**.
+- Staging/recovery/rollback: **NOT EVIDENCED**.
+- Market X live KPI baselines: **UNKNOWN / NOT CONNECTED**.
+- Formal release approval: **NOT OBTAINED**.
+
+**Decision: PRODUCTION HOLD.** The CI coverage milestone is complete, but project completion and release readiness are not established. The next valid transition requires named accountable and independent reviewers, an approved staging scope, trusted identity/evidence design, execution of the applicable acceptance cases, recovery/rollback proof and a formal release decision. No merge, deployment, admin-policy change, secrets access, production write or external action was performed.
