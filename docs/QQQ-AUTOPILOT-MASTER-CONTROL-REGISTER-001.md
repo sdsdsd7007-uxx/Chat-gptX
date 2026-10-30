@@ -448,3 +448,14 @@ The master spreadsheet was read across Master Dashboard, Node Register, Action P
 **Human governance unblock first:** an authorized repository owner should verify effective branch protection and assign a genuinely independent application-security/cryptography reviewer for PR #2 SR-10 and PR #4's caller-supplied approval/evidence boundary. In parallel, define the trusted authorization service contract and the DIIP freshness/clock-skew policy. Only after those requirements are reviewed should a bounded code/test change be selected. Then run the applicable QZ-AT-001–023 cases in explicitly authorized staging and retain recovery/rollback evidence.
 
 **Release posture: PRODUCTION HOLD / NOT APPROVED.** No merge, deployment, credential access, repository-admin policy change, production write, purchase or external partnership action was performed in this revalidation.
+
+
+## 13.8 PR #7 head movement — 2026-10-30 recheck
+
+A fresh PR metadata read shows PR #7 is now at `adf69686c1365a445a53bc1b951a90625c07fbbc`, not the previously recorded `92edeac6f416ca28f8f1dac964cf24036d74cbe4`. The new commit message is `fix: reconcile displayed scenario cost totals`; its diff changes the scenario-cost model to derive the displayed total from its rounded displayed components and adds a rounding-boundary regression test (expected index 108.177; change 8.177). This is a bounded arithmetic/report-reconciliation improvement, but this audit did not execute the test locally.
+
+The previously recorded exact-head push run #112 / `40839390308` validates the former SHA `92edeac6...` only. The current PR-event workflow query for `adf69686...` returned no runs, and the classic combined-status query returned no status entries. The available connector query is PR-event-filtered and does not enumerate every push check-run, so current exact-head CI for `adf69686...` is **NOT VERIFIED**, not a confirmed failure and not a confirmed absence of all checks. Re-run/inspect CI against the exact current SHA and retain the raw job checkout SHA and test totals before claiming a pass.
+
+All other PR heads remained unchanged in the 2026-10-30 recheck: #1 `a65228ff3d1d06c9cd8341e23858649335449039`; #2 `2c1068f2c94ef8edb5d72f6eb238a5aa6ff385a7`; #4 `8aa8c07e4f2628b3b19fc52556b8a9a86e7603d2`; #5 `6ff8a503875ec100932f684cd925837accacf992`; #8 `808c03e05f62b08ee22506349cd0484797b70375`; #9 `d86125aaac403d6c195bbbb6aa0330d4b972a0a3`. All seven PRs remain open/draft/unmerged; all seven review queries returned zero submitted reviews. QZ-AT-001–023 remain NOT RUN; AA-001–014 remain PROPOSED — NOT RUN; KPI baselines remain UNKNOWN / NOT CONNECTED. Production remains HOLD.
+
+**Next bounded action:** obtain exact-head CI evidence for PR #7's current SHA, then request independent review of the PR #2/PR #4 trust boundaries. Do not make a new implementation change until those results and reviewer ownership are established.
