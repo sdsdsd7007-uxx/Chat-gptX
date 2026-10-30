@@ -123,3 +123,52 @@ The two Project Q workflow files were read directly from the listed refs. The QZ
 
 This note changes reporting only. It does not change the release gate: **independent review, trusted authorization, staging acceptance, recovery/rollback and formal release approval remain open; production remains HOLD.**
 
+
+
+## Scheduled review addendum — 30 October 2026 (UTC)
+
+**Purpose:** refresh the evidence boundary after the 29 October CI snapshot. This addendum does not rewrite the historical 51-run dataset or imply application telemetry.
+
+### Current PR validation coverage
+
+The GitHub connector returned completed successful pull-request workflow runs associated with the following previously recorded PR heads:
+
+| PR | Head SHA recorded in PR metadata | Returned PR workflow run | Result |
+|---|---|---:|---|
+| #1 | `a65228ff3d1d06c9cd8341e23858649335449039` | #36 / 40607559878 | PASS |
+| #2 | `2c1068f2c94ef8edb5d72f6eb238a5aa6ff385a7` | #163 / 40628240801 | PASS |
+| #4 | `8aa8c07e4f2628b3b19fc52556b8a9a86e7603d2` | #126 / 40854049426 | PASS |
+| #5 | `6ff8a503875ec100932f684cd925837accacf992` | #92 / 40692666176 | PASS |
+| #7 | `d2cd81ede21f7ba253b4ae22a03de6b5aa464215` (last head recorded in PR body) | No run returned | NOT VERIFIED |
+| #8 | `881b5f8ed11aa1ca4027f7066264d0b49f88d4d8` (last head recorded in PR body) | No run returned | NOT VERIFIED |
+
+The PR metadata search did not expose structured `head_sha` fields. The #7 and #8 SHAs above are therefore **last-reported**, not independently confirmed live branch heads. The connector's commit-run query is first-page and PR-trigger-only; an empty result means NOT VERIFIED, not proof that no push run exists. PR #9 is the documentation branch containing this report; its exact current head was not exposed by the available search response and its CI is NOT VERIFIED.
+
+### Graph 3 — PR validation evidence coverage
+
+The graph counts six engineering/control PRs (#1, #2, #4, #5, #7, #8). Four have a returned successful PR workflow run for the SHA recorded in their PR body; two have no returned run for their last-reported SHA. It is a coverage snapshot, not a quality score.
+
+```mermaid
+xychart-beta
+    title "PR validation evidence coverage — 30 Oct 2026"
+    x-axis ["#1", "#2", "#4", "#5", "#7", "#8"]
+    y-axis "Returned successful PR run" 0 --> 1
+    bar [1, 1, 1, 1, 0, 0]
+```
+
+**Coverage:** 4/6 = 66.7% with returned successful PR-run evidence; 2/6 = 33.3% NOT VERIFIED. This denominator is only the six PRs shown. It does not represent branch protection, independent review, release readiness or production health.
+
+### Governance and review status
+
+- Submitted PR reviews: zero returned for #1, #2, #4, #5, #7, #8 and #9.
+- Inline review threads: zero returned for the same PR set.
+- Issue #3 and Issue #6 remain open release/security gates.
+- #7 contains a deterministic rounding reconciliation change in the fetched source and test files; however, its last-reported head has no returned workflow run in this review. The source file alone is not CI evidence.
+- #8 and #9 are documentation branches with no workflow files in their inspected trees; exact-head CI is NOT VERIFIED.
+- Production remains **HOLD / NOT APPROVED**.
+
+### Interpretation and next instrumentation
+
+Do not combine this PR coverage chart with the 51-attempt QZ/ASSD workflow dataset: they have different denominators and scopes. Keep the existing two SVG graphs and raw CSV as the historical QZ/ASSD CI snapshot. For future progress-over-time reporting, append one timestamped observation per workflow attempt and one per application task, keyed by commit/configuration and source freshness. Separate queue time, execution time, retries, cancellations, failures, quality, evidence completeness, resource cost and user outcome. Missing observations remain gaps; never zero-fill them.
+
+**Next bounded action:** verify live branch heads through a repository endpoint that returns PR head metadata, then rerun CI lookup on those exact SHAs. Do not infer current-head success from stale PR-body text. Independent review, trusted authorization, staging acceptance, recovery/rollback evidence and formal release approval remain mandatory.
