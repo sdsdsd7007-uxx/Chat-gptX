@@ -59,6 +59,22 @@ test('keeps component totals consistent with the resulting index', () => {
   assert.ok(Math.abs(sum - result.cost_index) < 1e-10);
 });
 
+test('derives the displayed total from rounded components at a rounding boundary', () => {
+  const result = calculateScenarioCostIndex({
+    supplier_share_pct: 50,
+    freight_share_pct: 30,
+    local_share_pct: 20,
+    supplier_price_change_pct: 3.333,
+    freight_change_pct: 7.777,
+    fx_change_pct: 4.444,
+    local_cost_change_pct: 2.222
+  });
+  const sum = Object.values(result.components).reduce((total, part) => total + part, 0);
+  assert.equal(result.cost_index, 108.177);
+  assert.equal(result.change_pct, 8.177);
+  assert.ok(Math.abs(sum - result.cost_index) < 1e-10);
+});
+
 test('rejects missing required fields', () => {
   const input = base();
   delete input.fx_change_pct;

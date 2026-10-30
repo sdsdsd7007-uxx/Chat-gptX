@@ -68,15 +68,20 @@ export function calculateScenarioCostIndex(input) {
   if (!Number.isFinite(costIndex)) throw new RangeError('computed cost index is not finite');
 
   const round4 = (value) => Math.round((value + Number.EPSILON) * 10000) / 10000;
+  const components = {
+    supplier: round4(supplierCost),
+    freight_and_insurance: round4(freightCost),
+    local_and_other: round4(localCost)
+  };
+  // Derive the displayed total from the displayed components so the report reconciles.
+  const displayedCostIndex = round4(
+    Object.values(components).reduce((sum, component) => sum + component, 0)
+  );
   return {
     baseline_index: 100,
-    cost_index: round4(costIndex),
-    change_pct: round4(costIndex - 100),
-    components: {
-      supplier: round4(supplierCost),
-      freight_and_insurance: round4(freightCost),
-      local_and_other: round4(localCost)
-    },
+    cost_index: displayedCostIndex,
+    change_pct: round4(displayedCostIndex - 100),
+    components,
     assumptions: { ...input },
     status: 'SYNTHETIC_SCENARIO_ONLY_NOT_A_FORECAST'
   };
